@@ -1,39 +1,50 @@
-# Pac-Man
-Pac-Man project in VB.NET.
-A fully functioning, playable Pac-Man game.
+# Pac-Man (Modified Fork)
+A customized version of the Pac-Man project in VB.NET WinForms, [original work](https://github.com/matthewjones089/Pac-Man) by Matt Jones in 2017.  
+A fully functioning, playable Pac-Man game with updated visuals and framework compatibility.
 
-This version includes:
-- Arcade-accurate ghost AI
-- Accurate recreation of original gameplay
-- A re-usable threaded game engine that supports tiles, maps, fonts and sprites
-- An integrated maze editor for creating new mazes
+**Modifications by Pac-Dessert1436**:  
+- Updated game font and partial in-game sprites for a refreshed visual style.  
+- Upgraded target framework from .NET Framework 4.5 to .NET Framework 4.8.
+- Fixed all the compiler warnings, including the naming convention problems.
+- Project now compatible with **Visual Studio 2022**.  
 
-Missing:
-- No audio
-- One player only
+---
 
-About:
-I developed this for my A-Level AQA Non Exam Assessment 2017.
-The project was created in Visual Basic 2012 with no additional 3rd party plugins.
+### Key Features
+- Arcade-accurate ghost AI  
+- Accurate recreation of original gameplay mechanics  
+- Re-usable threaded game engine supporting tiles, maps, fonts, and sprites  
+- Integrated maze editor for creating custom mazes  
 
-The assets are currently loaded from the debug folder, so if not running from debug, copy the assets to release.
-When I get time, I will hopefully update the project to include the assets as internal resouces.
+### Missing Features  
+- No audio support  
+- Single-player mode only  
 
-# Screenshots
+---
 
-Main Screen:
+### About  
+Originally developed for the **A-Level AQA Non Exam Assessment 2017** in Visual Basic 2012, this project has been updated to modern standards.  
+**Changes in this fork**:  
+- Migrated to **.NET Framework 4.8** for improved compatibility.  
+- Visual Studio 2022 support.  
+- Custom fonts and redesigned sprites.  
 
-![main screen](https://user-images.githubusercontent.com/33097312/33036827-85c34510-ce27-11e7-9e88-0831a43ed7bc.png)
+**Asset Note**:
+Assets are loaded from the Debug and Release folder.
 
-Original Pac-Man Maze in Action:
+---
 
-![pac-man maze](https://user-images.githubusercontent.com/33097312/33036836-8a492cbc-ce27-11e7-9f69-4b1f5e5ce5c1.png)
+### Screenshots  
+*(Note: Screenshots below, apart from the first one, reflect the original project; visuals differ in this fork due to font and sprite changes.)*  
 
-Map Editor:
+**Modified Title Screen**:  
+![title screen](new_title_screen.png)  
 
-![map editor](https://user-images.githubusercontent.com/33097312/33037003-13dd408a-ce28-11e7-8957-6056031fac17.png)
+**Pac-Man Maze in Action (Original)**:  
+![pac-man maze](https://user-images.githubusercontent.com/33097312/33036836-8a492cbc-ce27-11e7-9f69-4b1f5e5ce5c1.png)  
 
-Custom Maze in Action:
+**Map Editor (Original)**:  
+![map editor](https://user-images.githubusercontent.com/33097312/33037003-13dd408a-ce28-11e7-8957-6056031fac17.png)  
 
-![custom maze](https://user-images.githubusercontent.com/33097312/33036840-8ea6bc3e-ce27-11e7-8d05-f0cd0f70b6a8.png)
-
+**Custom Maze in Action (Original)**:  
+![custom maze](https://user-images.githubusercontent.com/33097312/33036840-8ea6bc3e-ce27-11e7-8d05-f0cd0f70b6a8.png)  
