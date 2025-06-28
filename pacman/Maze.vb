@@ -326,21 +326,19 @@ Public Class Maze
         ' Determines the type of tile that should be placed into each position of the maze.
         For y = 1 To 29
             For x = 1 To 26
-                If _path(x, y).pathType = PathType.block And _path(x, y).fixed = False Then
-                    ' Retrieves the type of block to be placed using the complex routine getTile.
-                    _data(x, y) = GetTile(x, y)
-                Else
-                    If _path(x, y).pathType = PathType.blank And _path(x, y).fixed = False Then
-                        _data(x, y) = 45
-                    Else
-                        If _path(x, y).pathType = PathType.dot And _path(x, y).fixed = False Then
+                If Not _path(x, y).fixed Then
+                    Select Case _path(x, y).pathType
+                        Case PathType.block
+                            ' Retrieves the type of block to be placed using the complex
+                            ' routine getTile.
+                            _data(x, y) = GetTile(x, y)
+                        Case PathType.blank
+                            _data(x, y) = 45
+                        Case PathType.dot
                             _data(x, y) = 46
-                        Else
-                            If _path(x, y).pathType = PathType.energizer And _path(x, y).fixed = False Then
-                                _data(x, y) = 47
-                            End If
-                        End If
-                    End If
+                        Case PathType.energizer
+                            _data(x, y) = 47
+                    End Select
                 End If
             Next
         Next
