@@ -242,11 +242,8 @@ Public Class Maze
     End Sub
 
     Public Sub SaveMaze(filename As String)
-
         Dim stream As FileStream
-
         stream = New FileStream(filename, FileMode.Create)
-
         For y = 0 To 30
             For x = 0 To 27
                 stream.WriteByte(_path(x, y).pathType)
@@ -597,10 +594,6 @@ Public Class Maze
             _data(27, 29) = defaultMaze(29, 27)
             _data(26, 30) = defaultMaze(30, 26)
         End If
-
-
-
-
     End Sub
 
 End Class

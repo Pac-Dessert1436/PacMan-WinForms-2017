@@ -4,9 +4,12 @@
 This project is a fully functional, modernized Pac-Man game built with VB.NET WinForms, originally based on [Matt Jones' 2017 project](https://github.com/matthewjones089/Pac-Man). This modified version features updated visuals and improved framework compatibility while preserving the classic gameplay experience.
 
 ## Key Enhancements
-- Modernized visual style with updated game font (inspired by Namco's "Pac-Man Arrangement 1996") and refreshed sprites
+- Modernized visual style with updated game font (inspired by Namco's _Pac-Man Arrangement 1996_) and refreshed sprites
 - Upgraded from **.NET Framework 4.5** to **.NET 9.0** for improved performance and compatibility
-- Resolved all compiler warnings and naming convention issues
+- Implemented audio playback using `NAudio` library with a thread-safe `AudioPlayer` class:
+    - **Sound effects**: original _Pac-Man_ and _Super Pac-Man_ (both arcade version)
+    - **Background music**: "P.A.R.T.Y. - Universe Festival" from anime _Kamen Rider Zi-O Over Quartzer_
+- Resolved all compiler warnings and naming convention issues, including enum members
 - Full compatibility with Visual Studio 2022/2026
 
 ### Features
@@ -14,9 +17,9 @@ This project is a fully functional, modernized Pac-Man game built with VB.NET Wi
 - Faithful recreation of classic Pac-Man gameplay mechanics
 - Reusable threaded game engine supporting tiles, maps, fonts, and sprites
 - Built-in maze editor for designing custom levels
+- Thread-safe audio system with synchronization locks (`SyncLock`) for safe playback
 
-### Limitations
-- No audio support
+### Current Limitation
 - Single-player mode only
 
 ## About

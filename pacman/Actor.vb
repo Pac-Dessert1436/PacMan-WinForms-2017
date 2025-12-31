@@ -15,13 +15,13 @@ Public Class Actor
 
     ' Enumerate ghost modes
     Public Enum GhostMode As Integer
-        ghostOutside = 0
-        ghostEaten = 1
-        ghostGoingHome = 2
-        ghostEnteringHome = 3
-        ghostPacingHome = 4
-        ghostLeavingHome = 5
-        ghostStart = 6
+        GhostOutside = 0
+        GhostEaten = 1
+        GhostGoingHome = 2
+        GhostEnteringHome = 3
+        GhostPacingHome = 4
+        GhostLeavingHome = 5
+        GhostStart = 6
     End Enum
 
     ' Enumerate ghost state
@@ -32,13 +32,13 @@ Public Class Actor
 
     ' Enumerate release modes
     Public Enum ReleaserMode
-        modePersonal = 0
-        modeGlobal = 1
+        ModePersonal = 0
+        ModeGlobal = 1
     End Enum
 
     ' Actors are stored internally as lists
     ' Initialize the lists for ghosts, Pac-Man and the fruit
-    Private Shared ReadOnly _ghost As New List(Of ghost)
+    Private Shared ReadOnly _ghost As New List(Of Ghost)
     Private Shared ReadOnly _pacman As New List(Of PacMan)
     Private Shared ReadOnly _fruit As New List(Of Fruit)
 
@@ -958,31 +958,31 @@ Public Class Actor
 
             For n = 0 To _ghost.Count - 1
                 With _ghost(n)
-                    Select Case .name
+                    Select Case .Name
                         Case "blinky"
-                            .personalDotLimit = 0
-                            .globalDotLimit = 0
+                            .PersonalDotLimit = 0
+                            .GlobalDotLimit = 0
                         Case "pinky"
-                            .personalDotLimit = 0
-                            .globalDotLimit = 7
+                            .PersonalDotLimit = 0
+                            .GlobalDotLimit = 7
                         Case "inky"
                             If level = 1 Then
-                                .personalDotLimit = 30
+                                .PersonalDotLimit = 30
                             Else
-                                .personalDotLimit = 0
+                                .PersonalDotLimit = 0
                             End If
-                            .globalDotLimit = 17
+                            .GlobalDotLimit = 17
                         Case "clyde"
-                            If level = 1 Then .personalDotLimit = 30
-                            If level = 2 Then .personalDotLimit = 60
-                            If level > 2 Then .personalDotLimit = 0
-                            .globalDotLimit = 32
+                            If level = 1 Then .PersonalDotLimit = 30
+                            If level = 2 Then .PersonalDotLimit = 60
+                            If level > 2 Then .PersonalDotLimit = 0
+                            .GlobalDotLimit = 32
                         Case Else
-                            .personalDotLimit = 0
-                            .globalDotLimit = 0
+                            .PersonalDotLimit = 0
+                            .GlobalDotLimit = 0
                     End Select
 
-                    .dotsCounter = 0
+                    .DotsCounter = 0
 
                 End With
             Next
@@ -1064,8 +1064,8 @@ Public Class Actor
             Else
                 For n = 0 To _ghost.Count - 1
                     With _ghost(n)
-                        If .mode = GhostMode.ghostPacingHome Then
-                            .dotsCounter += 1
+                        If .Mode = GhostMode.GhostPacingHome Then
+                            .DotsCounter += 1
                             Exit For
                         End If
                     End With
@@ -1082,9 +1082,9 @@ Public Class Actor
 
                 For n = 0 To _ghost.Count - 1
                     With _ghost(n)
-                        If .mode = GhostMode.ghostPacingHome Then
-                            If .dotsCounter >= .personalDotLimit Then
-                                .signalLeaveHome = True
+                        If .Mode = GhostMode.GhostPacingHome Then
+                            If .DotsCounter >= .PersonalDotLimit Then
+                                .SignalLeaveHome = True
                                 Exit Sub
                             End If
                             Exit For
@@ -1099,25 +1099,25 @@ Public Class Actor
                     For n = 0 To _ghost.Count - 1
                         With _ghost(n)
 
-                            Select Case .name
+                            Select Case .Name
 
                                 Case "pinky"
-                                    If _globalCount > .globalDotLimit And .mode = GhostMode.ghostPacingHome Then
-                                        .signalLeaveHome = True
+                                    If _globalCount > .GlobalDotLimit And .Mode = GhostMode.GhostPacingHome Then
+                                        .SignalLeaveHome = True
                                         Exit Sub
                                     End If
 
                                 Case "inky"
-                                    If _globalCount > .globalDotLimit And .mode = GhostMode.ghostPacingHome Then
-                                        .signalLeaveHome = True
+                                    If _globalCount > .GlobalDotLimit And .Mode = GhostMode.GhostPacingHome Then
+                                        .SignalLeaveHome = True
                                         Exit Sub
                                     End If
 
                                 Case "clyde"
-                                    If _globalCount > .globalDotLimit And .mode = GhostMode.ghostPacingHome Then
+                                    If _globalCount > .GlobalDotLimit And .Mode = GhostMode.GhostPacingHome Then
                                         _globalCount = 0
                                         _mode = Mode.modePersonal
-                                        .signalLeaveHome = True
+                                        .SignalLeaveHome = True
                                         Exit Sub
                                     End If
 
@@ -1140,8 +1140,8 @@ Public Class Actor
                 _framesSinceLastDot = 0
                 For n = 0 To _ghost.Count - 1
                     With _ghost(n)
-                        If .mode = GhostMode.ghostPacingHome Then
-                            .signalLeaveHome = True
+                        If .Mode = GhostMode.GhostPacingHome Then
+                            .SignalLeaveHome = True
                             Exit For
                         End If
                     End With
@@ -1167,27 +1167,27 @@ Public Class Actor
     ' -----------------------------------------------------------------------------------------------------------------------------
 
     Public Sub AddGhost(name As String, startPixel As Point, cornerTile As Point, startDirection As ActorDirection, startMode As GhostMode, arriveHomeMode As GhostMode)
-        Dim gh As New ghost With {
-            .name = name,
-            .mode = GhostMode.ghostPacingHome,
-            .pixel = startPixel,
-            .direction = startDirection,
-            .nextDirection = startDirection,
-            .signalReverse = False,
-            .signalLeaveHome = False,
-            .scared = False,
-            .flashing = False,
-            .targetting = False,
-            .startPixel = startPixel,
-            .cornerTile = cornerTile,
-            .startDirection = startDirection,
-            .startMode = startMode,
-            .arriveHomeMode = arriveHomeMode,
-            .personalDotLimit = 0,
-            .globalDotLimit = 0,
-            .dotsCounter = 0,
-            .eatenPixel = New Point(0, 0),
-            .eatenTimer = 0
+        Dim gh As New Ghost With {
+            .Name = name,
+            .Mode = GhostMode.GhostPacingHome,
+            .Pixel = startPixel,
+            .Direction = startDirection,
+            .NextDirection = startDirection,
+            .SignalReverse = False,
+            .SignalLeaveHome = False,
+            .Scared = False,
+            .Flashing = False,
+            .Targetting = False,
+            .StartPixel = startPixel,
+            .CornerTile = cornerTile,
+            .StartDirection = startDirection,
+            .StartMode = startMode,
+            .ArriveHomeMode = arriveHomeMode,
+            .PersonalDotLimit = 0,
+            .GlobalDotLimit = 0,
+            .DotsCounter = 0,
+            .EatenPixel = New Point(0, 0),
+            .EatenTimer = 0
         }
 
         _ghost.Add(gh)
@@ -1198,10 +1198,10 @@ Public Class Actor
     ' actor.ghostByName(name as String) as ghost
     ' -----------------------------------------------------------------------------------------------------------------------------
 
-    Public Function GhostByName(name As String) As ghost
+    Public Function GhostByName(name As String) As Ghost
 
         Dim index
-        index = _ghost.FindIndex((Function(f) f.name = name))
+        index = _ghost.FindIndex((Function(f) f.Name = name))
         Return _ghost(index)
 
     End Function
@@ -1210,7 +1210,7 @@ Public Class Actor
     ' actor.ghostByIndex(index as integer) as ghost
     ' -----------------------------------------------------------------------------------------------------------------------------
 
-    Public Function GhostByIndex(index As Integer) As ghost
+    Public Function GhostByIndex(index As Integer) As Ghost
 
         Return _ghost(index)
 
@@ -1222,7 +1222,7 @@ Public Class Actor
 
     Public Function GhostIndexByName(name As String) As Integer
 
-        Return _ghost.FindIndex((Function(f) f.name = name))
+        Return _ghost.FindIndex((Function(f) f.Name = name))
 
     End Function
 
@@ -1287,7 +1287,7 @@ Public Class Actor
 
     Public Function GetPacmanIndexByName(name As String) As Integer
 
-        Return _pacman.FindIndex((Function(f) f.name = name))
+        Return _pacman.FindIndex((Function(f) f.Name = name))
 
     End Function
 
@@ -1300,12 +1300,12 @@ Public Class Actor
         For n = 0 To _pacman.Count - 1
             With _pacman(n)
 
-                .pixel = .startPixel
-                .direction = ActorDirection.Left
-                .nextDirection = ActorDirection.None
-                .facing = ActorDirection.Left
-                .directionChanged = True
-                .died = False
+                .Pixel = .StartPixel
+                .Direction = ActorDirection.Left
+                .NextDirection = ActorDirection.None
+                .Facing = ActorDirection.Left
+                .DirectionChanged = True
+                .Died = False
 
             End With
         Next
@@ -1321,22 +1321,22 @@ Public Class Actor
         For n = 0 To _ghost.Count - 1
             With _ghost(n)
 
-                .signalReverse = False
-                .signalLeaveHome = False
+                .SignalReverse = False
+                .SignalLeaveHome = False
 
-                .mode = .startMode
-                .scared = False
-                .flashing = False
+                .Mode = .StartMode
+                .Scared = False
+                .Flashing = False
 
-                .direction = .startDirection
-                .pixel = .startPixel
-                .targetting = False
+                .Direction = .StartDirection
+                .Pixel = .StartPixel
+                .Targetting = False
 
-                .directionChanged = True
-                .scaredChanged = True
-                .flashingChanged = True
+                .DirectionChanged = True
+                .ScaredChanged = True
+                .FlashingChanged = True
 
-                .targetTile = .cornerTile
+                .TargetTile = .CornerTile
 
             End With
         Next
@@ -1436,16 +1436,16 @@ Public Class Actor
         If _energizedTimer > 0 Then
             If _energizedTimer = _energizedFlashTimer Then
                 For n = 0 To _ghost.Count - 1
-                    If _ghost(n).scared = True Then
-                        _ghost(n).flashing = True
+                    If _ghost(n).Scared = True Then
+                        _ghost(n).Flashing = True
                     End If
                 Next
             End If
             _energizedTimer -= 1
         Else
             For n = 0 To _ghost.Count - 1
-                _ghost(n).scared = False
-                _ghost(n).flashing = False
+                _ghost(n).Scared = False
+                _ghost(n).Flashing = False
             Next
         End If
 
@@ -1470,26 +1470,26 @@ Public Class Actor
 
             With _ghost(n)
 
-                If .eatenTimer > 0 Then
-                    .eatenTimer -= 1
+                If .EatenTimer > 0 Then
+                    .EatenTimer -= 1
                 End If
 
-                If .mode = GhostMode.ghostEaten Then
-                    .eatenPixel = .pixel
-                    .eatenTimer = (60 * 3)
-                    .mode = GhostMode.ghostGoingHome
+                If .Mode = GhostMode.GhostEaten Then
+                    .EatenPixel = .Pixel
+                    .EatenTimer = (60 * 3)
+                    .Mode = GhostMode.GhostGoingHome
                 End If
 
-                If .mode = GhostMode.ghostGoingHome Or .mode = GhostMode.ghostEnteringHome Then
+                If .Mode = GhostMode.GhostGoingHome Or .Mode = GhostMode.GhostEnteringHome Then
                     steps = 2
                 Else
-                    If .mode = GhostMode.ghostLeavingHome Or .mode = GhostMode.ghostPacingHome Then
+                    If .Mode = GhostMode.GhostLeavingHome Or .Mode = GhostMode.GhostPacingHome Then
                         steps = Int(Mid(_stepSize.ghostsPacing, _stepCounter, 1))
                     Else
-                        If .tile.Y = 14 And (.pixel.X < 40 Or .pixel.X > 184) Then
+                        If .Tile.Y = 14 And (.Pixel.X < 40 Or .Pixel.X > 184) Then
                             steps = Int(Mid(_stepSize.ghostsTunnel, _stepCounter, 1))
                         Else
-                            If .scared Then
+                            If .Scared Then
                                 steps = Int(Mid(_stepSize.ghostsFright, _stepCounter, 1))
                             Else
                                 ' ELROY TODO
@@ -1503,70 +1503,70 @@ Public Class Actor
 
                     ' Perform all home logic
 
-                    Select Case .mode
-                        Case GhostMode.ghostGoingHome
-                            If .tile = maze.homeDoorTile Then
-                                .direction = ActorDirection.Down
-                                .targetting = False
-                                If .pixel.X = maze.homeDoorPixel.X Then
-                                    .mode = GhostMode.ghostEnteringHome
-                                    .direction = ActorDirection.Down
+                    Select Case .Mode
+                        Case GhostMode.GhostGoingHome
+                            If .Tile = maze.homeDoorTile Then
+                                .Direction = ActorDirection.Down
+                                .Targetting = False
+                                If .Pixel.X = maze.homeDoorPixel.X Then
+                                    .Mode = GhostMode.GhostEnteringHome
+                                    .Direction = ActorDirection.Down
                                 Else
-                                    .direction = ActorDirection.Right
+                                    .Direction = ActorDirection.Right
                                 End If
                             End If
 
-                        Case GhostMode.ghostEnteringHome
-                            If .pixel.Y = maze.homeBottomPixel Then
-                                If .pixel.X = .startPixel.X Then
-                                    .direction = ActorDirection.Up
-                                    .mode = .arriveHomeMode
+                        Case GhostMode.GhostEnteringHome
+                            If .Pixel.Y = maze.homeBottomPixel Then
+                                If .Pixel.X = .StartPixel.X Then
+                                    .Direction = ActorDirection.Up
+                                    .Mode = .ArriveHomeMode
                                 Else
-                                    If .startPixel.X < .pixel.X Then
-                                        .direction = ActorDirection.Left
+                                    If .StartPixel.X < .Pixel.X Then
+                                        .Direction = ActorDirection.Left
                                     Else
-                                        .direction = ActorDirection.Right
+                                        .Direction = ActorDirection.Right
                                     End If
                                 End If
                             End If
 
-                        Case GhostMode.ghostPacingHome
-                            If .signalLeaveHome = True Then
-                                .signalLeaveHome = False
-                                .mode = GhostMode.ghostLeavingHome
-                                If .pixel.X = maze.homeDoorPixel.X Then
-                                    .direction = ActorDirection.Up
+                        Case GhostMode.GhostPacingHome
+                            If .SignalLeaveHome = True Then
+                                .SignalLeaveHome = False
+                                .Mode = GhostMode.GhostLeavingHome
+                                If .Pixel.X = maze.homeDoorPixel.X Then
+                                    .Direction = ActorDirection.Up
                                 Else
-                                    If .pixel.X < maze.homeDoorPixel.X Then
-                                        .direction = ActorDirection.Right
+                                    If .Pixel.X < maze.homeDoorPixel.X Then
+                                        .Direction = ActorDirection.Right
                                     Else
-                                        .direction = ActorDirection.Left
+                                        .Direction = ActorDirection.Left
                                     End If
                                 End If
                             Else
-                                If .pixel.Y = maze.homeTopPixel Then
-                                    .direction = ActorDirection.Down
+                                If .Pixel.Y = maze.homeTopPixel Then
+                                    .Direction = ActorDirection.Down
                                 Else
-                                    If .pixel.Y = maze.homeBottomPixel Then
-                                        .direction = ActorDirection.Up
+                                    If .Pixel.Y = maze.homeBottomPixel Then
+                                        .Direction = ActorDirection.Up
                                     End If
                                 End If
                             End If
 
-                        Case GhostMode.ghostLeavingHome
-                            If .pixel.X = maze.homeDoorPixel.X Then
-                                If .pixel.Y = maze.homeDoorPixel.Y Then
-                                    .mode = GhostMode.ghostOutside
+                        Case GhostMode.GhostLeavingHome
+                            If .Pixel.X = maze.homeDoorPixel.X Then
+                                If .Pixel.Y = maze.homeDoorPixel.Y Then
+                                    .Mode = GhostMode.GhostOutside
                                     Randomize()
                                     If CInt(Math.Ceiling(Rnd() * 2 - 1)) = 0 Then
-                                        .direction = ActorDirection.Left
-                                        .nextDirection = ActorDirection.Left
+                                        .Direction = ActorDirection.Left
+                                        .NextDirection = ActorDirection.Left
                                     Else
-                                        .direction = ActorDirection.Right
-                                        .nextDirection = ActorDirection.Right
+                                        .Direction = ActorDirection.Right
+                                        .NextDirection = ActorDirection.Right
                                     End If
                                 Else
-                                    .direction = ActorDirection.Up
+                                    .Direction = ActorDirection.Up
                                 End If
                             End If
 
@@ -1574,35 +1574,35 @@ Public Class Actor
 
                     ' If we are not pursuing a target tile then exit the subroutine as we are done
 
-                    If (.mode <> GhostMode.ghostOutside And .mode <> GhostMode.ghostGoingHome) Then
-                        .targetting = False
+                    If (.Mode <> GhostMode.GhostOutside And .Mode <> GhostMode.GhostGoingHome) Then
+                        .Targetting = False
                     Else
 
                         ' Are we are at the middle of a tile?
 
-                        If .atTileCenter = True Then
+                        If .AtTileCenter = True Then
 
                             ' If reversal has been triggered then do so
 
-                            If .signalReverse = True Then
-                                .reverseDirection = True
-                                .signalReverse = False
+                            If .SignalReverse = True Then
+                                .ReverseDirection = True
+                                .SignalReverse = False
                             End If
 
                             ' Commit the new direction
 
-                            .direction = .nextDirection
+                            .Direction = .NextDirection
 
                         Else
 
                             ' Have we just passed the mid-tile?
 
-                            If .justPassedCenter = True Then
+                            If .JustPassedCenter = True Then
 
                                 ' Get next tile
 
                                 Dim tilePos As Point
-                                tilePos = .nextTile
+                                tilePos = .NextTile
 
                                 ' Get exits from next tile
 
@@ -1619,7 +1619,7 @@ Public Class Actor
                                 ' of travel.
 
                                 If ex.Count > 1 Then
-                                    Select Case .direction
+                                    Select Case .Direction
                                         Case ActorDirection.Up
                                             For i = ex.Count - 1 To 0 Step -1
                                                 If ex(i) = Maze.MazeExits.exitDown Then
@@ -1653,7 +1653,7 @@ Public Class Actor
 
                                 ' If a ghost is scared then its moves are random;
 
-                                If .scared = True Then
+                                If .Scared = True Then
 
                                     ' Get Random Exit
 
@@ -1661,32 +1661,32 @@ Public Class Actor
 
                                     Dim randomExit As Integer
                                     randomExit = CInt(Math.Ceiling(Rnd() * (ex.Count - 1)))
-                                    .nextDirection = ex(randomExit)
+                                    .NextDirection = ex(randomExit)
 
                                 Else
 
-                                    If .mode = GhostMode.ghostGoingHome Then
+                                    If .Mode = GhostMode.GhostGoingHome Then
 
-                                        .targetTile = maze.homeDoorTile
+                                        .TargetTile = maze.homeDoorTile
 
                                     Else
 
                                         If State = GhostState.Scatter Then
 
-                                            .targetTile = .cornerTile
-                                            .targetting = True
+                                            .TargetTile = .CornerTile
+                                            .Targetting = True
 
                                         Else
 
-                                            Select Case _ghost(n).name
+                                            Select Case _ghost(n).Name
                                                 Case "blinky"
-                                                    .targetTile = BlinkyGetTargetTile()
+                                                    .TargetTile = BlinkyGetTargetTile()
                                                 Case "pinky"
-                                                    .targetTile = PinkyGetTargetTile()
+                                                    .TargetTile = PinkyGetTargetTile()
                                                 Case "inky"
-                                                    .targetTile = InkyGetTargetTile()
+                                                    .TargetTile = InkyGetTargetTile()
                                                 Case "clyde"
-                                                    .targetTile = ClydeGetTargetTile()
+                                                    .TargetTile = ClydeGetTargetTile()
                                             End Select
 
                                         End If
@@ -1704,19 +1704,19 @@ Public Class Actor
                                     For i = 0 To ex.Count - 1
                                         Select Case ex(i)
                                             Case Maze.MazeExits.exitUp
-                                                dist = Point.Subtract(Point.Add(.tile(), New Point(0, -1)), .targetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(0, -1)), .TargetTile)
                                             Case Maze.MazeExits.exitDown
-                                                dist = Point.Subtract(Point.Add(.tile(), New Point(0, 1)), .targetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(0, 1)), .TargetTile)
                                             Case Maze.MazeExits.exitLeft
-                                                dist = Point.Subtract(Point.Add(.tile(), New Point(-1, 0)), .targetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(-1, 0)), .TargetTile)
                                             Case Maze.MazeExits.exitRight
-                                                dist = Point.Subtract(Point.Add(.tile(), New Point(1, 0)), .targetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(1, 0)), .TargetTile)
                                         End Select
 
                                         distance = (dist.X * dist.X) + (dist.Y * dist.Y)
                                         If distance < distanceSelected Then
                                             distanceSelected = distance
-                                            .nextDirection = ex(i)
+                                            .NextDirection = ex(i)
                                         End If
 
                                     Next
@@ -1728,32 +1728,32 @@ Public Class Actor
                         End If
                     End If
 
-                    Select Case .direction
+                    Select Case .Direction
                         Case ActorDirection.Up
-                            .pixel = Point.Add(.pixel, New Size(0, -1))
+                            .Pixel = Point.Add(.Pixel, New Size(0, -1))
                         Case ActorDirection.Down
-                            .pixel = Point.Add(.pixel, New Size(0, 1))
+                            .Pixel = Point.Add(.Pixel, New Size(0, 1))
                         Case ActorDirection.Left
-                            .pixel = Point.Add(.pixel, New Size(-1, 0))
+                            .Pixel = Point.Add(.Pixel, New Size(-1, 0))
                         Case ActorDirection.Right
-                            .pixel = Point.Add(.pixel, New Size(1, 0))
+                            .Pixel = Point.Add(.Pixel, New Size(1, 0))
                     End Select
 
                     ' Deal with tunnel
 
-                    If .tile.Y = 14 Then
-                        If .pixel.X < -16 Then
-                            .pixel = New Point(239, .pixel.Y)
+                    If .Tile.Y = 14 Then
+                        If .Pixel.X < -16 Then
+                            .Pixel = New Point(239, .Pixel.Y)
                         Else
-                            If .pixel.X > 239 Then
-                                .pixel = New Point(-16, .pixel.Y)
+                            If .Pixel.X > 239 Then
+                                .Pixel = New Point(-16, .Pixel.Y)
                             End If
                         End If
                     End If
 
                     If Not invincible Then
                         For i = 0 To _pacman.Count - 1
-                            If .tile = _pacman(i).tile Then
+                            If .Tile = _pacman(i).Tile Then
                                 Collision(i, n)
                             End If
                         Next
@@ -1790,41 +1790,41 @@ Public Class Actor
                 ' Get next tile
 
                 Dim tilePos As Point
-                tilePos = .tile
+                tilePos = .Tile
 
                 Dim ex As List(Of Maze.MazeExits)
                 ex = maze.GetExits(tilePos)
 
                 Dim distFromCenter As Point
-                distFromCenter = .distanceFromCenter
+                distFromCenter = .DistanceFromCenter
 
-                Select Case .nextDirection
+                Select Case .NextDirection
 
                     Case ActorDirection.Left
                         If ex.IndexOf(ActorDirection.Left) < 0 Then
                             If distFromCenter.X = 0 Then
-                                .nextDirection = ActorDirection.None
+                                .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Right
                         If ex.IndexOf(ActorDirection.Right) < 0 Then
                             If distFromCenter.X = 0 Then
-                                .nextDirection = ActorDirection.None
+                                .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Up
                         If ex.IndexOf(ActorDirection.Up) < 0 Then
                             If distFromCenter.Y = 0 Then
-                                .nextDirection = ActorDirection.None
+                                .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Down
                         If ex.IndexOf(ActorDirection.Down) < 0 Then
                             If distFromCenter.Y = 0 Then
-                                .nextDirection = ActorDirection.None
+                                .NextDirection = ActorDirection.None
                             End If
                         End If
 
@@ -1832,82 +1832,82 @@ Public Class Actor
 
                 ' Stop moving if the exit is blocked in the direction of travel
 
-                If .direction = ActorDirection.Left Or .direction = ActorDirection.Right Then
-                    If ex.IndexOf(.direction) < 0 Then
+                If .Direction = ActorDirection.Left Or .Direction = ActorDirection.Right Then
+                    If ex.IndexOf(.Direction) < 0 Then
                         If distFromCenter.X = 0 Then
-                            .direction = ActorDirection.None
+                            .Direction = ActorDirection.None
                         End If
                     End If
                 End If
 
-                If .direction = ActorDirection.Up Or .direction = ActorDirection.Down Then
-                    If ex.IndexOf(.direction) < 0 Then
+                If .Direction = ActorDirection.Up Or .Direction = ActorDirection.Down Then
+                    If ex.IndexOf(.Direction) < 0 Then
                         If distFromCenter.Y = 0 Then
-                            .direction = ActorDirection.None
+                            .Direction = ActorDirection.None
                         End If
                     End If
                 End If
 
                 ' Update direction if it has changed
 
-                If .nextDirection <> ActorDirection.None Then
-                    .direction = .nextDirection
+                If .NextDirection <> ActorDirection.None Then
+                    .Direction = .NextDirection
                 End If
 
-                Select Case .direction
+                Select Case .Direction
                     Case ActorDirection.Up
-                        .pixel = Point.Add(.pixel, New Size(0, -1))
+                        .Pixel = Point.Add(.Pixel, New Size(0, -1))
                         If distFromCenter.X < 0 Then
-                            .pixel = Point.Add(.pixel, New Size(1, 0))
+                            .Pixel = Point.Add(.Pixel, New Size(1, 0))
                         Else
                             If distFromCenter.X > 0 Then
-                                .pixel = Point.Add(.pixel, New Size(-1, 0))
+                                .Pixel = Point.Add(.Pixel, New Size(-1, 0))
                             End If
                         End If
                     Case ActorDirection.Down
-                        .pixel = Point.Add(.pixel, New Size(0, 1))
+                        .Pixel = Point.Add(.Pixel, New Size(0, 1))
                         If distFromCenter.X < 0 Then
-                            .pixel = Point.Add(.pixel, New Size(1, 0))
+                            .Pixel = Point.Add(.Pixel, New Size(1, 0))
                         Else
                             If distFromCenter.X > 0 Then
-                                .pixel = Point.Add(.pixel, New Size(-1, 0))
+                                .Pixel = Point.Add(.Pixel, New Size(-1, 0))
                             End If
                         End If
                     Case ActorDirection.Left
-                        .pixel = Point.Add(.pixel, New Size(-1, 0))
+                        .Pixel = Point.Add(.Pixel, New Size(-1, 0))
                         If distFromCenter.Y < 0 Then
-                            .pixel = Point.Add(.pixel, New Size(0, 1))
+                            .Pixel = Point.Add(.Pixel, New Size(0, 1))
                         Else
                             If distFromCenter.Y > 0 Then
-                                .pixel = Point.Add(.pixel, New Size(0, -1))
+                                .Pixel = Point.Add(.Pixel, New Size(0, -1))
                             End If
                         End If
                     Case ActorDirection.Right
-                        .pixel = Point.Add(.pixel, New Size(1, 0))
+                        .Pixel = Point.Add(.Pixel, New Size(1, 0))
                         If distFromCenter.Y < 0 Then
-                            .pixel = Point.Add(.pixel, New Size(0, 1))
+                            .Pixel = Point.Add(.Pixel, New Size(0, 1))
                         Else
                             If distFromCenter.Y > 0 Then
-                                .pixel = Point.Add(.pixel, New Size(0, -1))
+                                .Pixel = Point.Add(.Pixel, New Size(0, -1))
                             End If
                         End If
                 End Select
 
                 ' Deal with tunnel
 
-                If .tile.Y = 14 Then
-                    If .pixel.X < -16 Then
-                        .pixel = New Point(239, .pixel.Y)
+                If .Tile.Y = 14 Then
+                    If .Pixel.X < -16 Then
+                        .Pixel = New Point(239, .Pixel.Y)
                     Else
-                        If .pixel.X > 239 Then
-                            .pixel = New Point(-16, .pixel.Y)
+                        If .Pixel.X > 239 Then
+                            .Pixel = New Point(-16, .Pixel.Y)
                         End If
                     End If
                 End If
 
                 If Not invincible Then
                     For i = 0 To _ghost.Count - 1
-                        If .tile = _ghost(i).tile Then
+                        If .Tile = _ghost(i).Tile Then
                             Collision(n, i)
                         End If
                     Next
@@ -1915,11 +1915,11 @@ Public Class Actor
 
                 ' If Pac-Man has eaten a fruit...
                 For i = 0 To _fruit.Count - 1
-                    If _fruit(i).active Then
-                        If .tile = _fruit(i).Tile Then
-                            _fruit(i).eaten = True
-                            _fruit(i).eatenTick = (3 * 60)
-                            _fruit(i).active = False
+                    If _fruit(i).Active Then
+                        If .Tile = _fruit(i).Tile Then
+                            _fruit(i).Eaten = True
+                            _fruit(i).EatenTick = (3 * 60)
+                            _fruit(i).Active = False
                         End If
                     End If
                 Next
@@ -1940,7 +1940,7 @@ Public Class Actor
         index = GetPacmanIndexByName("pacman")
 
         If index <> -1 Then
-            pos = _pacman(index).tile()
+            pos = _pacman(index).Tile()
         Else
             pos = New Point(1, 1)
         End If
@@ -1959,9 +1959,9 @@ Public Class Actor
         index = GetPacmanIndexByName("pacman")
 
         If index <> -1 Then
-            pos = _pacman(index).tile()
+            pos = _pacman(index).Tile()
 
-            Select Case _pacman(index).facing
+            Select Case _pacman(index).Facing
                 Case ActorDirection.Left
                     pos = Point.Add(pos, New Size(-4, 0))
                 Case ActorDirection.Right
@@ -1993,10 +1993,10 @@ Public Class Actor
 
         If index1 <> -1 And index2 <> -1 Then
 
-            pos1 = _pacman(index1).tile()
-            pos2 = _ghost(index2).tile()
+            pos1 = _pacman(index1).Tile()
+            pos2 = _ghost(index2).Tile()
 
-            Select Case _pacman(index1).facing
+            Select Case _pacman(index1).Facing
                 Case ActorDirection.Left
                     pos1 = Point.Add(pos1, New Size(-2, 0))
                 Case ActorDirection.Right
@@ -2035,13 +2035,13 @@ Public Class Actor
 
         If index1 <> -1 And index2 <> -1 Then
 
-            pos1 = _pacman(index1).tile()
-            pos2 = _ghost(index2).tile()
+            pos1 = _pacman(index1).Tile()
+            pos2 = _ghost(index2).Tile()
             pos3 = Point.Subtract(pos1, pos2)
 
             dist = pos3.X * pos3.X + pos3.Y * pos3.Y
             If dist < 64 Then
-                pos1 = _ghost(index2).cornerTile
+                pos1 = _ghost(index2).CornerTile
             End If
         End If
 
@@ -2056,20 +2056,20 @@ Public Class Actor
     Private Sub Collision(pacmanNumber As Integer, ghostNumber As Integer)
 
         If _energizedTimer > 0 Then
-            If _ghost(ghostNumber).scared = True Then
-                _ghost(ghostNumber).mode = GhostMode.ghostEaten
-                _ghost(ghostNumber).scared = False
-                _ghost(ghostNumber).flashing = False
-                _ghost(ghostNumber).eatenScore = _energizedScore
+            If _ghost(ghostNumber).Scared = True Then
+                _ghost(ghostNumber).Mode = GhostMode.GhostEaten
+                _ghost(ghostNumber).Scared = False
+                _ghost(ghostNumber).Flashing = False
+                _ghost(ghostNumber).EatenScore = _energizedScore
                 _energizedScore += 1
             Else
-                If _ghost(ghostNumber).mode <> GhostMode.ghostEaten And _ghost(ghostNumber).mode <> GhostMode.ghostGoingHome Then
-                    _pacman(pacmanNumber).died = True
+                If _ghost(ghostNumber).Mode <> GhostMode.GhostEaten And _ghost(ghostNumber).Mode <> GhostMode.GhostGoingHome Then
+                    _pacman(pacmanNumber).Died = True
                 End If
             End If
         Else
-            If _ghost(ghostNumber).mode <> GhostMode.ghostEaten And _ghost(ghostNumber).mode <> GhostMode.ghostGoingHome Then
-                _pacman(pacmanNumber).died = True
+            If _ghost(ghostNumber).Mode <> GhostMode.GhostEaten And _ghost(ghostNumber).Mode <> GhostMode.GhostGoingHome Then
+                _pacman(pacmanNumber).Died = True
             End If
         End If
 
@@ -2088,10 +2088,10 @@ Public Class Actor
             _energizedTimer = (_energizeTime(17) * 60) + _energizedFlashTimer
         End If
         For n = 0 To _ghost.Count - 1
-            If _ghost(n).mode <> GhostMode.ghostGoingHome Then
-                _ghost(n).scared = True
-                _ghost(n).flashing = False
-                _ghost(n).reverseDirection = True
+            If _ghost(n).Mode <> GhostMode.GhostGoingHome Then
+                _ghost(n).Scared = True
+                _ghost(n).Flashing = False
+                _ghost(n).ReverseDirection = True
             End If
         Next
         _energizedScore = 0

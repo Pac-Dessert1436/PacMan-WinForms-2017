@@ -1,5 +1,4 @@
-﻿Imports System.Threading
-Imports System.IO
+﻿Imports System.IO
 
 Public Class PacMan
 
@@ -16,13 +15,13 @@ Public Class PacMan
     ' GeRenderScene (this is used to perform additional rendering, or gameEngine logic)
 
     Dim WithEvents GameEngine As GameEngine
-    Public Shared maze As New Maze
+    Friend Shared maze As New Maze
     Dim WithEvents Actor As New Actor
 
     ' Determines whether the debugging logic is called. The default state is off
 
     Structure GhostData
-        Public name
+        Public name As String
         Public startPixel As Point
         Public cornerTile As Point
         Public startDirection As Actor.ActorDirection
@@ -44,14 +43,14 @@ Public Class PacMan
     Dim highScore As Integer
     Dim lives As Integer
     Dim stepCount As Integer
-    Dim state As GameState = GameState.reset
+    Dim state As GameState = GameState.Reset
 
     Enum GameState
-        reset = 0
-        menu = 1
-        getReady = 2
-        gameStarted = 3
-        playerDied = 4
+        Reset = 0
+        Menu = 1
+        GetReady = 2
+        GameStarted = 3
+        PlayerDied = 4
     End Enum
 
     Dim debug As Boolean = False
@@ -75,20 +74,31 @@ Public Class PacMan
 
     End Sub
 
+    Private Sub TransitionTo(state As GameState)
+        Select Case state
+            Case GameState.GetReady
+                bgmMainTheme.Stop()
+                bgmGetReady.PlayOnce()
+            Case GameState.GameStarted
+                bgmMainTheme.PlayLooping()
+            Case Else
+                bgmGetReady.Stop()
+                bgmMainTheme.Stop()
+        End Select
+        Me.state = state
+    End Sub
 
     Public Sub GameEngine_GE_GameLogic() Handles GameEngine.GE_GameLogic
-
         Dim last_score As Integer
-
         last_score = score
+
 
         ' This is the geGameLogic event.
         ' This is triggered once per frame by the gameEngine.
         ' It is meant to handle game logic ONLY.
 
         Select Case state
-
-            Case GameState.reset
+            Case GameState.Reset
 
                 ' We are in reset mode
                 ' This mode lasts a since frame and its sole purpose is to reset the game variables,
@@ -108,20 +118,19 @@ Public Class PacMan
                 GameEngine.SpriteByName("pacman").Enabled = False
 
                 ' Don't move Pac-Man in any direction
-                Actor.pacmanByName("pacman").direction = Actor.ActorDirection.None
+                Actor.PacmanByName("pacman").Direction = Actor.ActorDirection.None
 
                 ' Set the state to "Menu"
-                state = GameState.menu
+                TransitionTo(GameState.Menu)
 
-            Case GameState.menu
-
+            Case GameState.Menu
                 ' We are in menu mode (attract mode)
                 ' In this mode pacman is hidden and the ghosts wander the maze alternating
                 ' between scatter and chase mode every 10 seconds
 
                 ' Update the actors.
                 ' Because Pac-Man is disabled, we only update the ghosts
-                Actor.update(maze, invincibile)
+                Actor.Update(maze, invincibile)
 
                 ' If 1800 frames have passed (30 seconds), then reset the internal clock
                 If GameEngine.Clock > 1800 Then
@@ -149,31 +158,28 @@ Public Class PacMan
                     GameEngine.SpriteByName("pacman").Enabled = True
 
                     ' Set Pac-Man's initial direction to left
-                    Actor.pacmanByName("pacman").direction = Actor.ActorDirection.Left
+                    Actor.PacmanByName("pacman").Direction = Actor.ActorDirection.Left
 
                     ' Reset the level
                     ResetLevel()
 
                     ' Set the state to "getReady"
-                    state = GameState.getReady
+                    TransitionTo(GameState.GetReady)
                 End If
 
-            Case GameState.getReady
-
+            Case GameState.GetReady
                 ' We are in getReady mode.
                 ' In this mode the text "Get Ready!" is displayed for 120 frames (2 seconds)
 
-                ' If 120 frames have passed (2 seconds) then we have displayed the 
+                ' If 120 frames have passed (3.5 seconds) then we have displayed the 
                 ' "Get Ready!" messages for long enough, so move the game state onwards.
-                If GameEngine.Clock > (60 * 2) Then
+                If GameEngine.Clock > CInt(60 * 3.5) Then
 
                     ' Set the state to "gameStarted"
-                    state = GameState.gameStarted
-
+                    TransitionTo(GameState.GameStarted)
                 End If
 
-            Case GameState.gameStarted
-
+            Case GameState.GameStarted
                 ' We are in the gameStarted mode.
                 ' In this mode the player is actually playing the game, so this handles the
                 ' main game logic.
@@ -183,53 +189,53 @@ Public Class PacMan
 
                 ' If the input resolves to up then set the Pac-Man actor's direction to up
                 If input.up Then
-                    Actor.pacmanByName("pacman").nextDirection = Actor.ActorDirection.Up
+                    Actor.PacmanByName("pacman").NextDirection = Actor.ActorDirection.Up
                 End If
 
                 ' If the input resolves to down then set the Pac-Man actor's direction to down
                 If input.down Then
-                    Actor.pacmanByName("pacman").nextDirection = Actor.ActorDirection.Down
+                    Actor.PacmanByName("pacman").NextDirection = Actor.ActorDirection.Down
                 End If
 
                 ' If the input resolves to left then set the Pac-Man actor's direction to left
                 If input.left Then
-                    Actor.pacmanByName("pacman").nextDirection = Actor.ActorDirection.Left
+                    Actor.PacmanByName("pacman").NextDirection = Actor.ActorDirection.Left
                 End If
 
                 ' If the input resolves to right then set the Pac-Man actor's direction to right
                 If input.right Then
-                    Actor.pacmanByName("pacman").nextDirection = Actor.ActorDirection.Right
+                    Actor.PacmanByName("pacman").NextDirection = Actor.ActorDirection.Right
                 End If
 
                 ' Update the actors
-                Actor.update(maze, invincibile)
+                Actor.Update(maze, invincibile)
 
                 ' If Pacman has eaten a dot...
-                If maze.Data(Actor.pacmanByName("pacman").tile) = Maze.MazeObjects.dot Then
-
+                If maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.dot Then
+                    sndDotEaten.PlayOnce()
                     ' Increase the score by 10 points
                     score += 10
 
                     ' Update the maze, replacing the dot with a blank tile
-                    maze.Data(Actor.pacmanByName("pacman").tile) = Maze.MazeObjects.blank
+                    maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.blank
 
                     ' Update the gameEngine map, replacing the dot with a blank tile
-                    GameEngine.MapByName("main").Value(Point.Add(Actor.pacmanByName("pacman").tile, New Point(0, 3))) = Maze.MazeObjects.blank
+                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Point(0, 3))) = Maze.MazeObjects.blank
 
                     ' Inform the ghost releaser that a dot has been eaten
-                    Actor.ghostReleaser.dotEat()
+                    Actor.ghostReleaser.DotEat()
 
                     ' When 70 or 170 dots have been eaten, we should update the fruit state
                     If maze.DotEaten = 70 Or maze.DotEaten = 170 Then
 
                         ' If the fruit is not already active we can active it
-                        If Actor.FruitByName("fruit").active = False Then
+                        If Actor.FruitByName("fruit").Active = False Then
 
                             ' Fruit stays active for 540 frames (9 seconds)
-                            Actor.FruitByName("fruit").tick = (9 * 60)
+                            Actor.FruitByName("fruit").Tick = (9 * 60)
 
                             ' Enable the fruit
-                            Actor.FruitByName("fruit").active = True
+                            Actor.FruitByName("fruit").Active = True
                         End If
                     End If
 
@@ -244,14 +250,14 @@ Public Class PacMan
                         NextLevel()
 
                         ' Set the state to "getReady"
-                        state = GameState.getReady
+                        TransitionTo(GameState.GetReady)
                     End If
 
                 End If
 
                 ' If Pacman has eaten an energizer...
-                If maze.Data(Actor.pacmanByName("pacman").tile) = Maze.MazeObjects.energizer Then
-
+                If maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.energizer Then
+                    sndPowerEaten.PlayOnce()
                     ' Increase the score by 50 points
                     score += 50
 
@@ -259,10 +265,10 @@ Public Class PacMan
                     Actor.Energize()
 
                     ' Update the maze, replacing the energizer with a blank tile
-                    maze.Data(Actor.pacmanByName("pacman").tile) = Maze.MazeObjects.blank
+                    maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.blank
 
                     ' Update the gameEngine map, replacing the energizer with a blank tile
-                    GameEngine.MapByName("main").Value(Point.Add(Actor.pacmanByName("pacman").tile, New Point(0, 3))) = Maze.MazeObjects.blank
+                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Point(0, 3))) = Maze.MazeObjects.blank
 
                     ' If the number of dots eaten equal the total maze dot count then
                     ' the maze is complete and we need to start the next level
@@ -275,37 +281,37 @@ Public Class PacMan
                         NextLevel()
 
                         ' Set the state to "getReady"
-                        state = GameState.getReady
+                        TransitionTo(GameState.GetReady)
                     End If
 
                 End If
 
                 ' If Pacman has died...
-                If Actor.pacmanByName("pacman").died = True Then
-
+                If Actor.PacmanByName("pacman").Died = True Then
+                    sndLifeLost.PlayOnce()
                     ' Reset the game engine clock
                     GameEngine.Clock = 0
 
                     ' Set the state to "playerDied"
-                    state = GameState.playerDied
+                    TransitionTo(GameState.PlayerDied)
 
                 End If
 
                 ' If Pac-Man has eaten a fruit...
-                If Actor.FruitByName("fruit").eaten = True Then
-
+                If Actor.FruitByName("fruit").Eaten = True Then
+                    sndFruitEaten.PlayOnce()
                     ' Increase the score by whatever the fruit was worth
-                    score += Actor.FruitByName("fruit").points
+                    score += Actor.FruitByName("fruit").Points
 
                     ' Reset the fruit eaten state within the actor class
-                    Actor.FruitByName("fruit").eaten = False
+                    Actor.FruitByName("fruit").Eaten = False
 
                 End If
 
                 ' Set the ghost state based on the current gameEngine clock (current tick)
-                Actor.setGhostState(GameEngine.Clock)
+                Actor.SetGhostState(GameEngine.Clock)
 
-            Case GameState.playerDied
+            Case GameState.PlayerDied
 
                 ' We are in the playerDied mode.
                 ' In this mode, game play stops and an animation of Pac-Man dying is played
@@ -324,10 +330,10 @@ Public Class PacMan
                         ResetLevel()
 
                         ' Inform the releaser class that the level has restarted
-                        Actor.ghostReleaser.restartLevel()
+                        Actor.ghostReleaser.RestartLevel()
 
                         ' Set the state to "getReady"
-                        state = GameState.getReady
+                        TransitionTo(GameState.GetReady)
 
                     Else
 
@@ -342,7 +348,7 @@ Public Class PacMan
                         stream.Close()
 
                         ' Set the state to "Reset"
-                        state = GameState.reset
+                        TransitionTo(GameState.Reset)
                     End If
 
                 End If
@@ -350,6 +356,7 @@ Public Class PacMan
         End Select
 
         If score >= 10000 And last_score < 10000 Then
+            sndLifeGained.PlayOnce()
             redrawStatus = True
             lives += 1
         End If
@@ -367,7 +374,7 @@ Public Class PacMan
         ' It is meant to handle rendering type logic.
 
         ' If the state is not "playerDied"...
-        If state <> GameState.playerDied Then
+        If state <> GameState.PlayerDied Then
 
             ' Iterate through the ghosts and update their positions
             For n = 0 To ghosts.Count - 1
@@ -379,12 +386,12 @@ Public Class PacMan
 
                     ' Update the ghost sprite based on whether it's scared...
                     ' If the ghost is scared and the ghost has either only just become scared, or is flashing...
-                    If .scared And (.scaredChanged Or .flashingChanged) Then
+                    If .Scared And (.ScaredChanged Or .FlashingChanged) Then
 
                         ' If the ghost is flashing and only just changed to a flashing state then
                         ' set it's animation range to alternate between white and blue,
                         ' otherwise the ghost is simply blue
-                        If .flashing And .flashingChanged = True Then
+                        If .Flashing And .FlashingChanged = True Then
                             GameEngine.SpriteByName(ghosts(n).name).AnimationRange = New GameEngine.Sprite.GE_AnimationRange(8, 11)
                         Else
                             GameEngine.SpriteByName(ghosts(n).name).AnimationRange = New GameEngine.Sprite.GE_AnimationRange(8, 9)
@@ -393,13 +400,13 @@ Public Class PacMan
 
                     ' Update the ghost sprite based on whether it's not scared...
                     ' If the ghost is not scared and the ghost has either changed direction or is just changing back from scared...
-                    If Not .scared And (.directionChanged Or .scaredChanged) Then
+                    If Not .Scared And (.DirectionChanged Or .ScaredChanged) Then
 
                         ' If the ghost is going home or entering home...
-                        If .mode = Actor.GhostMode.ghostGoingHome Or .mode = Actor.GhostMode.ghostEnteringHome Then
+                        If .Mode = Actor.GhostMode.GhostGoingHome Or .Mode = Actor.GhostMode.GhostEnteringHome Then
 
                             ' Change the animation based on the direction that the ghost is facing
-                            Select Case .direction
+                            Select Case .Direction
                                 Case Actor.ActorDirection.Right
                                     GameEngine.SpriteByName(ghosts(n).name).AnimationRange = New GameEngine.Sprite.GE_AnimationRange(12, 12)
                                 Case Actor.ActorDirection.Left
@@ -415,7 +422,7 @@ Public Class PacMan
                             ' If the ghost is not going home and not entering home...
 
                             ' Change the animation based on the direction that the ghost is facing
-                            Select Case .direction
+                            Select Case .Direction
                                 Case Actor.ActorDirection.Right
                                     GameEngine.SpriteByName(ghosts(n).name).AnimationRange = New GameEngine.Sprite.GE_AnimationRange(0, 1)
                                 Case Actor.ActorDirection.Left
@@ -430,7 +437,7 @@ Public Class PacMan
                     End If
 
                     ' If eaten timer has started...
-                    If .eatenTimer > 0 Then
+                    If .EatenTimer > 0 Then
 
                         ' If 3 seconds (180 frames) have passed since the ghost has been eaten then
                         ' update the score.
@@ -438,37 +445,38 @@ Public Class PacMan
                         ' The simple calculation for this is;
                         ' 2 ^ [Sequence Eaten] * 100
 
-                        If .eatenTimer = (60 * 3) Then
-                            score += (2 ^ (.eatenScore + 1)) * 100
+                        If .EatenTimer = (60 * 3) Then
+                            sndGhostEaten.PlayOnce()
+                            score += (2 ^ (.EatenScore + 1)) * 100
                         End If
 
                         ' Display the eaten score in the appropriate location
-                        GameEngine.SpriteByName(.name & "score").AnimationRange = New GameEngine.Sprite.GE_AnimationRange(.eatenScore, .eatenScore)
-                        GameEngine.SpriteByName(.name & "score").Point = Point.Add(.eatenPixel, New Point(-7, 16))
-                        GameEngine.SpriteByName(.name & "score").Enabled = True
+                        GameEngine.SpriteByName(.Name & "score").AnimationRange = New GameEngine.Sprite.GE_AnimationRange(.EatenScore, .EatenScore)
+                        GameEngine.SpriteByName(.Name & "score").Point = Point.Add(.EatenPixel, New Point(-7, 16))
+                        GameEngine.SpriteByName(.Name & "score").Enabled = True
                     Else
 
                         ' The eaten timer has ran out so remove the score
-                        GameEngine.SpriteByName(.name & "score").Enabled = False
+                        GameEngine.SpriteByName(.Name & "score").Enabled = False
 
                     End If
 
                     ' Reset the direction changed, scared changed and flashing changed flags as we
                     ' have processed them now
-                    .directionChanged = False
-                    .scaredChanged = False
-                    .flashingChanged = False
+                    .DirectionChanged = False
+                    .ScaredChanged = False
+                    .FlashingChanged = False
 
                 End With
 
                 ' Calculate and set the ghost position within the game surface.
                 ' This is done by offsetting the ghost by -7 in the x direction and +16 in the y direction.
-                GameEngine.SpriteByName(ghosts(n).name).Point = Point.Add(Actor.GhostByName(ghosts(n).name).pixel, New Size(-7, 16))
+                GameEngine.SpriteByName(ghosts(n).name).Point = Point.Add(Actor.GhostByName(ghosts(n).name).Pixel, New Size(-7, 16))
 
                 ' If debugging is turned on then calculate the debug squares position.
                 ' This is done by offsetting the debug square by -3 in the x direction and 20 in the y direction.
                 If debug = True Then
-                    GameEngine.SpriteByName(ghosts(n).name & "debug").Point = Point.Add(Actor.GhostByName(ghosts(n).name).targetPixel, New Size(-7 + 4, 16 + 4))
+                    GameEngine.SpriteByName(ghosts(n).name & "debug").Point = Point.Add(Actor.GhostByName(ghosts(n).name).TargetPixel, New Size(-7 + 4, 16 + 4))
                 End If
             Next
 
@@ -480,22 +488,22 @@ Public Class PacMan
             For n = 0 To pacman.Count - 1
 
                 ' For each Pac-Man actor...
-                With Actor.pacmanByIndex(n)
+                With Actor.PacmanByIndex(n)
 
                     ' If the Pac-Man direction has changed...
-                    If .directionChanged = True Then
+                    If .DirectionChanged = True Then
 
                         ' If Pac-Man is no longer moving then stop the Pac-Man animation,
                         ' otherwise the animation mode is geBoth which means the animation plays
                         ' forwards to the last frame and then backwards to the first frame, then repeats.
-                        If .direction = Actor.ActorDirection.None Then
+                        If .Direction = Actor.ActorDirection.None Then
                             GameEngine.SpriteByName(pacman(n).name).AnimateMode = GameEngine.Sprite.GE_AnimationMode.geNone
                         Else
                             GameEngine.SpriteByName(pacman(n).name).AnimateMode = GameEngine.Sprite.GE_AnimationMode.geBoth
                         End If
 
                         ' Update the animation based on the direction that Pac-Man is facing.
-                        Select Case .direction
+                        Select Case .Direction
                             Case Actor.ActorDirection.Right
                                 GameEngine.SpriteByName(pacman(n).name).AnimationRange = New GameEngine.Sprite.GE_AnimationRange(0, 2)
                             Case Actor.ActorDirection.Left
@@ -507,14 +515,14 @@ Public Class PacMan
                         End Select
 
                         ' Reset the direction changed flag as we have processed it now
-                        .directionChanged = False
+                        .DirectionChanged = False
 
                     End If
                 End With
 
                 ' Calculate and set the Pac-Man position within the game surface.
                 ' This is done by offsetting Pac-Man by -7 in the x direction and +16 in the y direction.
-                GameEngine.SpriteByName(pacman(n).name).Point = Point.Add(Actor.pacmanByName(pacman(n).name).pixel, New Size(-7, 16))
+                GameEngine.SpriteByName(pacman(n).name).Point = Point.Add(Actor.PacmanByName(pacman(n).name).Pixel, New Size(-7, 16))
 
             Next
 
@@ -522,17 +530,17 @@ Public Class PacMan
             With Actor.FruitByName("fruit")
 
                 ' If a fruit is active then set the fruit type and enable it...
-                If .active And .tick > 0 Then
+                If .Active And .Tick > 0 Then
                     GameEngine.SpriteByName("fruit").AnimationRange = New GameEngine.Sprite.GE_AnimationRange(.Number, .Number)
                     GameEngine.SpriteByName("fruit").Enabled = True
                 Else
 
                     ' If a fruit is not active then check the eatenTick to determine whether we
                     ' should be displaying a fruit score or not...
-                    If Not .active And .eatenTick > 0 Then
+                    If Not .Active And .EatenTick > 0 Then
 
                         ' If we are displaying a fruit score then show the appropriate tile
-                        Select Case .points
+                        Select Case .Points
                             Case 100
                                 GameEngine.SpriteByName("fruit").AnimationRange = New GameEngine.Sprite.GE_AnimationRange(8, 8)
                             Case 300
@@ -599,7 +607,7 @@ Public Class PacMan
 
         ' If the game state is "menu" then we should render the opening credits and instructions
         ' about how to start the game...
-        If state = GameState.menu Then
+        If state = GameState.Menu Then
             GameEngine.DrawTextbyName("font", "MODIFIED BY", New Point((8 * TILE_SIZE) + 4, (24 * TILE_SIZE)))
             GameEngine.DrawTextbyName("font", "PAC DESSERT1436", New Point((6 * TILE_SIZE) + 4, (25 * TILE_SIZE)))
             GameEngine.DrawTextbyName("font", "PRESS SPACE", New Point((8 * TILE_SIZE) + 4, (27 * TILE_SIZE)))
@@ -607,7 +615,7 @@ Public Class PacMan
         End If
 
         ' If the game state is "getReady" then we should render the "GET READY" text
-        If state = GameState.getReady Then
+        If state = GameState.GetReady Then
             GameEngine.DrawTextbyName("font", "GET READY", New Point((9 * TILE_SIZE) + 4, (20 * TILE_SIZE)))
         End If
 
@@ -656,8 +664,8 @@ Public Class PacMan
             .cornerTile = New Point(25, -3)
             .startPixel = New Point((14 * TILE_SIZE) - 1, (11 * TILE_SIZE) + 4)
             .startDirection = Actor.ActorDirection.Left
-            .startMode = Actor.GhostMode.ghostOutside
-            .arriveHomeMode = Actor.GhostMode.ghostLeavingHome
+            .startMode = Actor.GhostMode.GhostOutside
+            .arriveHomeMode = Actor.GhostMode.GhostLeavingHome
         End With
 
         With ghosts(1)
@@ -665,8 +673,8 @@ Public Class PacMan
             .cornerTile = New Point(2, -3)
             .startPixel = New Point((14 * TILE_SIZE) - 1, (14 * TILE_SIZE) + 4)
             .startDirection = Actor.ActorDirection.Down
-            .startMode = Actor.GhostMode.ghostPacingHome
-            .arriveHomeMode = Actor.GhostMode.ghostPacingHome
+            .startMode = Actor.GhostMode.GhostPacingHome
+            .arriveHomeMode = Actor.GhostMode.GhostPacingHome
         End With
 
         With ghosts(2)
@@ -674,8 +682,8 @@ Public Class PacMan
             .cornerTile = New Point(27, 31)
             .startPixel = New Point((12 * TILE_SIZE) - 1, (14 * TILE_SIZE) + 4)
             .startDirection = Actor.ActorDirection.Up
-            .startMode = Actor.GhostMode.ghostPacingHome
-            .arriveHomeMode = Actor.GhostMode.ghostPacingHome
+            .startMode = Actor.GhostMode.GhostPacingHome
+            .arriveHomeMode = Actor.GhostMode.GhostPacingHome
         End With
 
         With ghosts(3)
@@ -683,8 +691,8 @@ Public Class PacMan
             .cornerTile = New Point(0, 31)
             .startPixel = New Point((16 * TILE_SIZE) - 1, (14 * TILE_SIZE) + 4)
             .startDirection = Actor.ActorDirection.Up
-            .startMode = Actor.GhostMode.ghostPacingHome
-            .arriveHomeMode = Actor.GhostMode.ghostPacingHome
+            .startMode = Actor.GhostMode.GhostPacingHome
+            .arriveHomeMode = Actor.GhostMode.GhostPacingHome
         End With
 
         ' We keep pacmans starting state in an array
@@ -706,7 +714,7 @@ Public Class PacMan
 
         ' Create a pacman actor with starting positions from the pacman arrays
         For n = 0 To pacman.Count - 1
-            Actor.addPacman(pacman(n).name, pacman(n).startPixel, pacman(n).startDirection)
+            Actor.AddPacman(pacman(n).name, pacman(n).startPixel, pacman(n).startDirection)
         Next
 
         ' Create a fruit actor
@@ -746,7 +754,7 @@ Public Class PacMan
                 ' Add a new ghost sprite and initialize it
                 GameEngine.AddSprite(.name, New Size(16, 16))
                 With GameEngine.SpriteByName(.name)
-                    .Point = Actor.GhostByName(.Name).pixel
+                    .Point = Actor.GhostByName(.Name).Pixel
                     .AnimateMode = GameEngine.Sprite.GE_AnimationMode.geForward
                     .AnimateOnFrame = 7
                     .AnimationRange = New GameEngine.Sprite.GE_AnimationRange(4, 5)
@@ -774,7 +782,7 @@ Public Class PacMan
             With pacman(n)
                 GameEngine.AddSprite(.name, New Size(16, 16))
                 With GameEngine.SpriteByName(.name)
-                    .Point = Actor.pacmanByName(.Name).pixel
+                    .Point = Actor.PacmanByName(.Name).Pixel
                     .AnimateMode = GameEngine.Sprite.GE_AnimationMode.geNone
                     .AnimateOnFrame = 5
                     .AnimationRange = New GameEngine.Sprite.GE_AnimationRange(3, 5)
@@ -853,13 +861,13 @@ Public Class PacMan
         lives = 3
 
         ' Reset ghost actors
-        Actor.resetGhost()
+        Actor.ResetGhost()
 
         ' Reset pacman actor
-        Actor.resetPacman()
+        Actor.ResetPacman()
 
         ' Reset ghost releaser
-        Actor.ghostReleaser.newLevel(level)
+        Actor.ghostReleaser.NewLevel(level)
 
         ' Reset fruit
         Actor.ResetFruit()
@@ -888,13 +896,13 @@ Public Class PacMan
         ' It is usually called when Pac-Man dies but has more lives.
 
         ' Reset ghost actors
-        Actor.resetGhost()
+        Actor.ResetGhost()
 
         ' Reset pacman actor
-        Actor.resetPacman()
+        Actor.ResetPacman()
 
         ' Reset ghost releaser
-        Actor.ghostReleaser.newLevel(level)
+        Actor.ghostReleaser.NewLevel(level)
 
         ' Update the status bar (fruits)
         UpdateStatus()
@@ -910,13 +918,13 @@ Public Class PacMan
         ' It is usually called when Pac-Man has eaten all of the dots on a level.
 
         ' Reset ghost actors
-        Actor.resetGhost()
+        Actor.ResetGhost()
 
         ' Reset pacman actor
-        Actor.resetPacman()
+        Actor.ResetPacman()
 
         ' Reset ghost releaser
-        Actor.ghostReleaser.newLevel(level)
+        Actor.ghostReleaser.NewLevel(level)
 
         ' Reset fruit
         Actor.ResetFruit()
@@ -948,7 +956,7 @@ Public Class PacMan
         For l = 0 To 6
 
             ' Get a character from the fruit list
-            FruitChar = Mid(Actor.FruitByName("fruit").list, l + 1, 1)
+            FruitChar = Mid(Actor.FruitByName("fruit").List, l + 1, 1)
 
             ' If the fruit character is not blank then render the fruit
             If FruitChar <> " " Then
@@ -1147,7 +1155,7 @@ Public Class PacMan
     Private Sub ToolStrip_Instructions_Click(sender As Object, e As EventArgs) Handles ToolStrip_Instructions.Click
 
         GameEngine.EndEngine()
-        Program.instructions.ShowDialog()
+        Program.Instructions.ShowDialog()
         GameEngine.StartEngine()
 
     End Sub
@@ -1167,7 +1175,7 @@ Public Class PacMan
             .RestoreDirectory = True
         }
 
-        If state = GameState.gameStarted Or state = GameState.getReady Or state = GameState.playerDied Then
+        If state = GameState.GameStarted Or state = GameState.GetReady Or state = GameState.PlayerDied Then
             ans = MsgBox("Loading a maze will end the current game." & Chr(13) & "Are you sure that you want to continue?", MsgBoxStyle.YesNo, "Load Maze")
         Else
             ans = vbYes
@@ -1181,7 +1189,7 @@ Public Class PacMan
 
                 maze.LoadMaze(fileName)
 
-                state = GameState.reset
+                state = GameState.Reset
 
             End If
 
@@ -1193,7 +1201,7 @@ Public Class PacMan
 
     Private Sub ToolStrip_MapEditor_Click(sender As Object, e As EventArgs) Handles ToolStrip_MapEditor.Click
 
-        Program.mapEditor.Show()
+        Program.MapEditor.Show()
 
     End Sub
 
@@ -1201,7 +1209,7 @@ Public Class PacMan
 
         GameEngine.EndEngine()
         If MsgBox("Are you sure that you want to start a new game?", MsgBoxStyle.YesNo, "New Game") = MsgBoxResult.Yes Then
-            state = GameState.reset
+            state = GameState.Reset
         End If
         GameEngine.StartEngine()
 

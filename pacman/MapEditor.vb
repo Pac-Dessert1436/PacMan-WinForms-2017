@@ -337,9 +337,6 @@ Public Class MapEditor
     End Sub
     
     Private Sub LoadToolbarIcons()
-        ' Initialize the ImageList if it doesn't exist yet
-        If iconImage Is Nothing Then iconImage = New ImageList()
-        
         ' Set the image size for the ImageList
         iconImage.ImageSize = New Size(16, 16)
         
@@ -389,6 +386,7 @@ Public Class MapEditor
     End Sub
 
     Private Sub ToolStripBlock_Click(sender As Object, e As EventArgs) Handles toolStripBlock.Click
+
         If blockMode <> Mode.addBlock And blockMode <> Mode.deleteBlock Then
             toolStripBlock.Image = iconImage.Images(1)
             toolStripDot.Image = iconImage.Images(3)

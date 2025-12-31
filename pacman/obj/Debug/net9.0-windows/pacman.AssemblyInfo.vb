@@ -16,7 +16,7 @@ Imports System.Reflection
 <Assembly: System.Reflection.AssemblyCompanyAttribute("pacman"),  _
  Assembly: System.Reflection.AssemblyConfigurationAttribute("Debug"),  _
  Assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0"),  _
- Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee45ae086a183c3458fd870eac627bc05a75c745"),  _
+ Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f6b449aa8e3bfce19829d930fbcbb631b2233b2"),  _
  Assembly: System.Reflection.AssemblyProductAttribute("pacman"),  _
  Assembly: System.Reflection.AssemblyTitleAttribute("pacman"),  _
  Assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0"),  _
