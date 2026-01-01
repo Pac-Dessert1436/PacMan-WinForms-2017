@@ -19,8 +19,9 @@ This project is a fully functional, modernized Pac-Man game built with VB.NET Wi
 - Built-in maze editor for designing custom levels
 - Thread-safe audio system with synchronization locks (`SyncLock`) for safe playback
 
-### Current Limitation
+### Limitations
 - Single-player mode only
+- No pause menu or game over screen
 
 ## About
 This project originated from Matt Jones' **A-Level AQA Non-Exam Assessment 2017**, developed in Visual Basic 2012. While modernized to .NET 9.0 and Visual Studio 2022/2026, it retains the nostalgic charm and gameplay of the original arcade classic.
