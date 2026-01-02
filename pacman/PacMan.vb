@@ -8,6 +8,7 @@ Public Class PacMan
     Public Const CLIENT_HEIGHT = 288
     Public Const CLIENT_SCALE = 2
     Public Const FPS = 60
+    Private Const BONUS_LIFE_SCORE = 10000
 
     ' Create a new instance of the gameEngine and specify that we want events.
     ' GameEngine exposes two public events that get called on each game loop
@@ -355,7 +356,7 @@ Public Class PacMan
 
         End Select
 
-        If score >= 10000 And last_score < 10000 Then
+        If score >= BONUS_LIFE_SCORE And last_score < BONUS_LIFE_SCORE Then
             sndLifeGained.PlayOnce()
             redrawStatus = True
             lives += 1
@@ -627,7 +628,10 @@ Public Class PacMan
             statusText.Text = "FPS: " & Format(GameEngine.Fps, "000.0")
         End If
 
-        If score >= 10000 And last_score < 10000 Then
+        If score >= BONUS_LIFE_SCORE And last_score < BONUS_LIFE_SCORE Then
+            ' Fixed: Now the sound effect for player's live gained can also be played here (i.e.
+            '        after the player reaches 10,000 points by eating ghosts)
+            sndLifeGained.PlayOnce()
             redrawStatus = True
             lives += 1
         End If
