@@ -19,5 +19,4 @@
         Application.SetCompatibleTextRenderingDefault(False)
         Application.Run(New PacMan)
     End Sub
-
 End Module

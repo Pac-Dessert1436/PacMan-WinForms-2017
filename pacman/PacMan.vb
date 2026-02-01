@@ -647,19 +647,19 @@ Public Class PacMan
 
         ' Set Form to use double buffering
         ' This prevents flickering as it uses two surfaces and flicks between each
-        Me.DoubleBuffered = True
+        DoubleBuffered = True
 
         ' Form is not maximized
-        Me.MaximizeBox = False
+        MaximizeBox = False
 
         ' Set border style to fixed
-        Me.FormBorderStyle = FormBorderStyle.FixedSingle
+        FormBorderStyle = FormBorderStyle.FixedSingle
 
         ' Set the client width and height
-        Me.ClientSize = New Size((CLIENT_WIDTH) * CLIENT_SCALE, CLIENT_HEIGHT * CLIENT_SCALE + MenuStrip2.Height + StatusStrip1.Height)
+        ClientSize = New Size((CLIENT_WIDTH) * CLIENT_SCALE, CLIENT_HEIGHT * CLIENT_SCALE + MenuStrip2.Height + StatusStrip1.Height)
 
         ' Center Form to screen
-        Me.CenterToScreen()
+        CenterToScreen()
 
         ' We keep the ghost starting states in an array as this allows us to reset them quicker.
         ' Initialize those arrays...
@@ -1253,8 +1253,19 @@ Public Class PacMan
     End Sub
 
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
+        
+        Close()
 
-        Me.Close()
+    End Sub
 
+    Private Sub Form_Closing(sender As Object, e As EventArgs) Handles MyBase.Closing
+        bgmGetReady?.Dispose()
+        bgmMainTheme?.Dispose()
+        sndLifeLost?.Dispose()
+        sndFruitEaten?.Dispose()
+        sndDotEaten?.Dispose()
+        sndGhostEaten?.Dispose()
+        sndLifeGained?.Dispose()
+        sndPowerEaten?.Dispose()
     End Sub
 End Class

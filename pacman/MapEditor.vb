@@ -284,8 +284,8 @@ Public Class MapEditor
 
     Public Sub Initialize()
 
-        Me.ClientSize = New Size((CLIENT_WIDTH * CLIENT_SCALE), CLIENT_HEIGHT * CLIENT_SCALE)
-        Me.BackColor = Color.Black
+        ClientSize = New Size((CLIENT_WIDTH * CLIENT_SCALE), CLIENT_HEIGHT * CLIENT_SCALE)
+        BackColor = Color.Black
 
         ' Toolstrip defaults to rounded corners, so turn them off as it doesn't look great
         If TypeOf ToolStrip1.Renderer Is ToolStripProfessionalRenderer Then
@@ -593,7 +593,7 @@ Public Class MapEditor
 
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
 
-        Me.Close()
+        Close()
 
     End Sub
 
