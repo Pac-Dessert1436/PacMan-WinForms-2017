@@ -69,8 +69,8 @@ Public Class Actor
     Private Shared _level As Integer
 
     ' Energize and energize flash time in frames. One element per level
-    Private Shared ReadOnly _energizeTime() = {6, 5, 4, 3, 2, 5, 2, 2, 1, 5, 2, 1, 1, 3, 1, 1, 0, 1}
-    Private Shared ReadOnly _energizeFlashTime() = {5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 5, 3, 3, 5, 3, 3, 0, 3}
+    Private Shared ReadOnly _energizeTime As Integer() = {6, 5, 4, 3, 2, 5, 2, 2, 1, 5, 2, 1, 1, 3, 1, 1, 0, 1}
+    Private Shared ReadOnly _energizeFlashTime As Integer() = {5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 5, 3, 3, 5, 3, 3, 0, 3}
 
     ' Current energized timer, energized flash timer, and energized score
     Private _energizedTimer As Integer
@@ -93,7 +93,7 @@ Public Class Actor
         Private _name As String
         Private _pixel As Point
         Private _number As Integer
-        Private _active As Integer
+        Private _active As Boolean
         Private _tick As Integer
         Private _points As Integer
         Private _eaten As Boolean
@@ -133,8 +133,8 @@ Public Class Actor
         ReadOnly Property Tile As Point
             Get
 
-                Tile.X = Int(_pixel.X / 8)
-                Tile.Y = Int(_pixel.Y / 8)
+                Tile.X = CInt(Int(_pixel.X / 8))
+                Tile.Y = CInt(Int(_pixel.Y / 8))
 
             End Get
         End Property
@@ -164,9 +164,7 @@ Public Class Actor
             End Get
             Set(value As Boolean)
                 _active = value
-                If _active = False Then
-                    _tick = 0
-                End If
+                If Not _active Then _tick = 0
             End Set
         End Property
 
@@ -435,8 +433,8 @@ Public Class Actor
                 TargetPixel.Y *= 8
             End Get
             Set(value As Point)
-                _targetTile.X = Int(TargetPixel.X / 8)
-                _targetTile.Y = Int(TargetPixel.Y / 8)
+                _targetTile.X = CInt(Int(TargetPixel.X / 8))
+                _targetTile.Y = CInt(Int(TargetPixel.Y / 8))
             End Set
         End Property
 
@@ -548,11 +546,11 @@ Public Class Actor
         ' actor.ghost.directionChanged as boolean
         ' -----------------------------------------------------------------------------------------------------------------------------
 
-        Property DirectionChanged As Integer
+        Property DirectionChanged As Boolean
             Get
                 DirectionChanged = _directionChanged
             End Get
-            Set(value As Integer)
+            Set(value As Boolean)
                 _directionChanged = value
             End Set
         End Property
@@ -561,11 +559,11 @@ Public Class Actor
         ' actor.ghost.directionChanged as boolean
         ' -----------------------------------------------------------------------------------------------------------------------------
 
-        Property ScaredChanged As Integer
+        Property ScaredChanged As Boolean
             Get
                 ScaredChanged = _scaredChanged
             End Get
-            Set(value As Integer)
+            Set(value As Boolean)
                 _scaredChanged = value
             End Set
         End Property
@@ -613,11 +611,11 @@ Public Class Actor
         ' actor.ghost.directionChanged as boolean
         ' -----------------------------------------------------------------------------------------------------------------------------
 
-        Property FlashingChanged As Integer
+        Property FlashingChanged As Boolean
             Get
                 FlashingChanged = _flashingChanged
             End Get
-            Set(value As Integer)
+            Set(value As Boolean)
                 _flashingChanged = value
             End Set
         End Property
@@ -682,8 +680,8 @@ Public Class Actor
         ReadOnly Property Tile As Point
             Get
 
-                Tile.X = Int(_pixel.X / 8)
-                Tile.Y = Int(_pixel.Y / 8)
+                Tile.X = CInt(Int(_pixel.X / 8))
+                Tile.Y = CInt(Int(_pixel.Y / 8))
 
             End Get
         End Property
@@ -697,8 +695,8 @@ Public Class Actor
 
                 Dim tile As Point
 
-                tile.X = Int(_pixel.X / 8)
-                tile.Y = Int(_pixel.Y / 8)
+                tile.X = CInt(Int(_pixel.X / 8))
+                tile.Y = CInt(Int(_pixel.Y / 8))
 
                 Select Case _direction
                     Case ActorDirection.Left
@@ -850,11 +848,11 @@ Public Class Actor
         ' actor.pacman.directionChanged as boolean
         ' -----------------------------------------------------------------------------------------------------------------------------
 
-        Property DirectionChanged As Integer
+        Property DirectionChanged As Boolean
             Get
                 DirectionChanged = _directionChanged
             End Get
-            Set(value As Integer)
+            Set(value As Boolean)
                 _directionChanged = value
             End Set
         End Property
@@ -863,11 +861,11 @@ Public Class Actor
         ' actor.pacman.died as boolean
         ' -----------------------------------------------------------------------------------------------------------------------------
 
-        Property Died As Integer
+        Property Died As Boolean
             Get
                 Died = _died
             End Get
-            Set(value As Integer)
+            Set(value As Boolean)
                 _died = value
             End Set
         End Property
@@ -879,8 +877,8 @@ Public Class Actor
         ReadOnly Property Tile As Point
             Get
 
-                Tile.X = Int(_pixel.X / 8)
-                Tile.Y = Int(_pixel.Y / 8)
+                Tile.X = CInt(Int(_pixel.X / 8))
+                Tile.Y = CInt(Int(_pixel.Y / 8))
 
             End Get
         End Property
@@ -894,8 +892,8 @@ Public Class Actor
 
                 Dim tile As Point
 
-                tile.X = Int(_pixel.X / 8)
-                tile.Y = Int(_pixel.Y / 8)
+                tile.X = CInt(Int(_pixel.X / 8))
+                tile.Y = CInt(Int(_pixel.Y / 8))
 
                 Select Case _direction
                     Case ActorDirection.Left
@@ -1200,8 +1198,8 @@ Public Class Actor
 
     Public Function GhostByName(name As String) As Ghost
 
-        Dim index
-        index = _ghost.FindIndex((Function(f) f.Name = name))
+        Dim index As Integer
+        index = _ghost.FindIndex(Function(f) f.Name = name)
         Return _ghost(index)
 
     End Function
@@ -1222,7 +1220,7 @@ Public Class Actor
 
     Public Function GhostIndexByName(name As String) As Integer
 
-        Return _ghost.FindIndex((Function(f) f.Name = name))
+        Return _ghost.FindIndex(Function(f) f.Name = name)
 
     End Function
 
@@ -1265,8 +1263,8 @@ Public Class Actor
 
     Public Function PacmanByName(name As String) As PacMan
 
-        Dim index
-        index = _pacman.FindIndex((Function(f) f.Name = name))
+        Dim index As Integer
+        index = _pacman.FindIndex(Function(f) f.Name = name)
         Return _pacman(index)
 
     End Function
@@ -1484,16 +1482,16 @@ Public Class Actor
                     steps = 2
                 Else
                     If .Mode = GhostMode.GhostLeavingHome Or .Mode = GhostMode.GhostPacingHome Then
-                        steps = Int(Mid(_stepSize.ghostsPacing, _stepCounter, 1))
+                        steps = CInt(Int(Mid(_stepSize.ghostsPacing, _stepCounter, 1)))
                     Else
                         If .Tile.Y = 14 And (.Pixel.X < 40 Or .Pixel.X > 184) Then
-                            steps = Int(Mid(_stepSize.ghostsTunnel, _stepCounter, 1))
+                            steps = CInt(Int(Mid(_stepSize.ghostsTunnel, _stepCounter, 1)))
                         Else
                             If .Scared Then
-                                steps = Int(Mid(_stepSize.ghostsFright, _stepCounter, 1))
+                                steps = CInt(Int(Mid(_stepSize.ghostsFright, _stepCounter, 1)))
                             Else
                                 ' ELROY TODO
-                                steps = Int(Mid(_stepSize.ghostsNormal, _stepCounter, 1))
+                                steps = CInt(Int(Mid(_stepSize.ghostsNormal, _stepCounter, 1)))
                             End If
                         End If
                     End If
@@ -1661,7 +1659,7 @@ Public Class Actor
 
                                     Dim randomExit As Integer
                                     randomExit = CInt(Math.Ceiling(Rnd() * (ex.Count - 1)))
-                                    .NextDirection = ex(randomExit)
+                                    .NextDirection = CType(ex(randomExit), ActorDirection)
 
                                 Else
 
@@ -1704,19 +1702,19 @@ Public Class Actor
                                     For i = 0 To ex.Count - 1
                                         Select Case ex(i)
                                             Case Maze.MazeExits.exitUp
-                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(0, -1)), .TargetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Size(0, -1)), CType(.TargetTile, Size))
                                             Case Maze.MazeExits.exitDown
-                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(0, 1)), .TargetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Size(0, 1)), CType(.TargetTile, Size))
                                             Case Maze.MazeExits.exitLeft
-                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(-1, 0)), .TargetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Size(-1, 0)), CType(.TargetTile, Size))
                                             Case Maze.MazeExits.exitRight
-                                                dist = Point.Subtract(Point.Add(.Tile(), New Point(1, 0)), .TargetTile)
+                                                dist = Point.Subtract(Point.Add(.Tile(), New Size(1, 0)), CType(.TargetTile, Size))
                                         End Select
 
                                         distance = (dist.X * dist.X) + (dist.Y * dist.Y)
                                         If distance < distanceSelected Then
                                             distanceSelected = distance
-                                            .NextDirection = ex(i)
+                                            .NextDirection = CType(ex(i), ActorDirection)
                                         End If
 
                                     Next
@@ -1776,7 +1774,7 @@ Public Class Actor
 
         Dim steps As Integer
 
-        steps = Int(Mid(_stepSize.pacmanNormal, _stepCounter, 1))
+        steps = CInt(Int(Mid(_stepSize.pacmanNormal, _stepCounter, 1)))
         If f > steps Then Exit Sub
 
         ' Loop through all pacman items
@@ -1801,28 +1799,28 @@ Public Class Actor
                 Select Case .NextDirection
 
                     Case ActorDirection.Left
-                        If ex.IndexOf(ActorDirection.Left) < 0 Then
+                        If ex.IndexOf(Maze.MazeExits.exitLeft) < 0 Then
                             If distFromCenter.X = 0 Then
                                 .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Right
-                        If ex.IndexOf(ActorDirection.Right) < 0 Then
+                        If ex.IndexOf(Maze.MazeExits.exitRight) < 0 Then
                             If distFromCenter.X = 0 Then
                                 .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Up
-                        If ex.IndexOf(ActorDirection.Up) < 0 Then
+                        If ex.IndexOf(Maze.MazeExits.exitUp) < 0 Then
                             If distFromCenter.Y = 0 Then
                                 .NextDirection = ActorDirection.None
                             End If
                         End If
 
                     Case ActorDirection.Down
-                        If ex.IndexOf(ActorDirection.Down) < 0 Then
+                        If ex.IndexOf(Maze.MazeExits.exitDown) < 0 Then
                             If distFromCenter.Y = 0 Then
                                 .NextDirection = ActorDirection.None
                             End If
@@ -1833,7 +1831,7 @@ Public Class Actor
                 ' Stop moving if the exit is blocked in the direction of travel
 
                 If .Direction = ActorDirection.Left Or .Direction = ActorDirection.Right Then
-                    If ex.IndexOf(.Direction) < 0 Then
+                    If ex.IndexOf(CType(.Direction, Maze.MazeExits)) < 0 Then
                         If distFromCenter.X = 0 Then
                             .Direction = ActorDirection.None
                         End If
@@ -1841,7 +1839,7 @@ Public Class Actor
                 End If
 
                 If .Direction = ActorDirection.Up Or .Direction = ActorDirection.Down Then
-                    If ex.IndexOf(.Direction) < 0 Then
+                    If ex.IndexOf(CType(.Direction, Maze.MazeExits)) < 0 Then
                         If distFromCenter.Y = 0 Then
                             .Direction = ActorDirection.None
                         End If
@@ -2007,9 +2005,9 @@ Public Class Actor
                     pos1 = Point.Add(pos1, New Size(0, 2))
             End Select
 
-            pos3 = Point.Subtract(pos2, pos1)
-            pos3 = Point.Add(pos3, pos3)
-            pos1 = Point.Subtract(pos1, pos3)
+            pos3 = Point.Subtract(pos2, CType(pos1, Size))
+            pos3 = Point.Add(pos3, CType(pos3, Size))
+            pos1 = Point.Subtract(pos1, CType(pos3, Size))
 
         Else
 
@@ -2037,7 +2035,7 @@ Public Class Actor
 
             pos1 = _pacman(index1).Tile()
             pos2 = _ghost(index2).Tile()
-            pos3 = Point.Subtract(pos1, pos2)
+            pos3 = Point.Subtract(pos1, CType(pos2, Size))
 
             dist = pos3.X * pos3.X + pos3.Y * pos3.Y
             If dist < 64 Then
@@ -2191,8 +2189,8 @@ Public Class Actor
 
     Public Function FruitByName(name As String) As Fruit
 
-        Dim index
-        index = _fruit.FindIndex((Function(f) f.Name = name))
+        Dim index As Integer
+        index = _fruit.FindIndex(Function(f) f.Name = name)
         Return _fruit(index)
 
     End Function

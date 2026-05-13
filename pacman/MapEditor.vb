@@ -61,7 +61,10 @@ Public Class MapEditor
         If MapEngine.GetMouse IsNot Nothing Then
 
             ' Set the mapCursor point (measured in 8x8 tile units)
-            mapCursor.Point = New Point(Int(MapEngine.GetMouse.Location.X / (8 * CLIENT_SCALE)) * 8, Int(MapEngine.GetMouse.Location.Y / (8 * CLIENT_SCALE)) * 8)
+            mapCursor.Point = New Point(
+                CInt(Int(MapEngine.GetMouse.Location.X / (8 * CLIENT_SCALE)) * 8),
+                CInt(Int(MapEngine.GetMouse.Location.Y / (8 * CLIENT_SCALE)) * 8)
+            )
 
         End If
 
@@ -73,7 +76,10 @@ Public Class MapEditor
         ' This is triggered once per frame by the gameEngine and reports mouse movement
 
         ' Get the current mouse position
-        Dim pos As New Point(Int(e.Location.X / (8 * CLIENT_SCALE)), Int(e.Location.Y / (8 * CLIENT_SCALE)))
+        Dim pos As New Point(
+            CInt(Int(e.Location.X / (8 * CLIENT_SCALE))),
+            CInt(Int(e.Location.Y / (8 * CLIENT_SCALE)))
+        )
 
         ' Set the mapCursor point (measured in 8x8 tile units)
         mapCursor.Point = New Point(pos.X * 8, pos.Y * 8)
@@ -202,7 +208,10 @@ Public Class MapEditor
         ' This is triggered once per frame by the gameEngine and reports button releases on the mouse
 
         ' Get the current mouse position
-        Dim pos = New Point(Int(e.Location.X / (8 * CLIENT_SCALE)), Int(e.Location.Y / (8 * CLIENT_SCALE)))
+        Dim pos = New Point(
+            CInt(Int(e.Location.X / (8 * CLIENT_SCALE))),
+            CInt(Int(e.Location.Y / (8 * CLIENT_SCALE)))
+        )
 
         ' Depending upon the mode indicated by the blockMode variable, a different outlining box is shown.
         Select Case blockMode

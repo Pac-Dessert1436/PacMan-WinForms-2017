@@ -6,6 +6,9 @@
     <RootNamespace>pacman</RootNamespace>
     <StartupObject>Sub Main</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>On</OptionStrict>
+    <OptionInfer>On</OptionInfer>
   </PropertyGroup>
 
   <ItemGroup>

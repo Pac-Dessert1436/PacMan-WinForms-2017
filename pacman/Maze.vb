@@ -246,7 +246,7 @@ Public Class Maze
         stream = New FileStream(filename, FileMode.Create)
         For y = 0 To 30
             For x = 0 To 27
-                stream.WriteByte(_path(x, y).pathType)
+                stream.WriteByte(CByte(_path(x, y).pathType))
             Next
         Next
 
@@ -302,7 +302,7 @@ Public Class Maze
             stream = New FileStream(filename, FileMode.Open)
             For y = 0 To 30
                 For x = 0 To 27
-                    _path(x, y).pathType = stream.ReadByte()
+                    _path(x, y).pathType = CType(stream.ReadByte(), PathType)
                 Next
             Next
             stream.Close()
@@ -344,7 +344,7 @@ Public Class Maze
 
     End Sub
 
-    Private Function GetTile(x As Integer, y As Integer)
+    Private Function GetTile(x As Integer, y As Integer) As Integer
 
         Dim n, s, e, w, ne, nw, se, sw As Boolean
 

@@ -197,11 +197,11 @@
     Public Event GE_MouseDown(sender As Object, e As MouseEventArgs)
     Public Event GE_MouseUp(sender As Object, e As MouseEventArgs)
 
-    Public Property Scale
+    Public Property Scale As Integer
         Get
             Scale = _geSurface._scale
         End Get
-        Set(value)
+        Set(value As Integer)
             _geSurface._scale = Scale
         End Set
     End Property
@@ -240,17 +240,17 @@
         End Get
     End Property
 
-    Public ReadOnly Property GetSurface As PictureBox
-        Get
-            GetSurface = _geSurface._client
-        End Get
-    End Property
+    'Public ReadOnly Property GetSurface As PictureBox
+    '    Get
+    '        GetSurface = _geSurface._client
+    '    End Get
+    'End Property
 
-    Public ReadOnly Property GetImage
-        Get
-            GetImage = _geSurface._image
-        End Get
-    End Property
+    'Public ReadOnly Property GetImage As Image
+    '    Get
+    '        GetImage = _geSurface._image
+    '    End Get
+    'End Property
 
     ' -----------------------------------------------------------------------------------------------------------------------------
     ' gameEngine.addSprite(as gameEngine.geSprite)
@@ -508,11 +508,14 @@
             tileOffset = _geMap(n).Point
 
             Dim tilePos As Point
-            tilePos = New Point(Int((p.X - tileOffset.X) / tileSize.Width), Int((p.Y - tileOffset.Y) / tileSize.Height))
+            tilePos = New Point(
+                CInt(Int((p.X - tileOffset.X) / tileSize.Width)),
+                CInt(Int((p.Y - tileOffset.Y) / tileSize.Height))
+            )
 
             For yy = tilePos.Y To tilePos.Y + (_geFont(index).Size.Height / tileSize.Height) + 1
                 For xx = tilePos.X To tilePos.X + ((_geFont(index).Size.Width * Len(text)) / tileSize.Width) + 1
-                    _geMap(n).Invalidated(New Point(xx, yy)) = True
+                    _geMap(n).Invalidated(New Point(CInt(xx), CInt(yy))) = True
                 Next
             Next
         Next
@@ -563,8 +566,8 @@
 
             ' Get number of tiles in X and Y direction
 
-            numberTilesX = pbTileSet.Image.Width / _size.Width
-            numberTilesY = pbTileSet.Image.Height / _size.Height
+            numberTilesX = CInt(pbTileSet.Image.Width / _size.Width)
+            numberTilesY = CInt(pbTileSet.Image.Height / _size.Height)
 
             ' Loop through each row and column per individual tile
 
@@ -595,7 +598,7 @@
 
                     End Using
 
-                    _geTileset.Add(bm.Clone)
+                    _geTileset.Add(CType(bm.Clone, Image))
                     _count += 1
 
                 Next
@@ -871,8 +874,8 @@
 
             ' Get number of tiles in X and Y direction
 
-            numberTilesX = pbTileSet.Image.Width / _size.Width
-            numberTilesY = pbTileSet.Image.Height / _size.Height
+            numberTilesX = CInt(pbTileSet.Image.Width / _size.Width)
+            numberTilesY = CInt(pbTileSet.Image.Height / _size.Height)
 
             ' Loop through each row and column per individual tile
 
@@ -908,7 +911,7 @@
 
                     ' Add the current tile into our list of tiles and increment the frame count
 
-                    _geTileset.Add(bm.Clone)
+                    _geTileset.Add(CType(bm.Clone, Image))
                     _totalframes += 1
 
                 Next
@@ -961,11 +964,14 @@
                     tileOffset = _parent._geMap(n).Point
 
                     Dim tilePos As Point
-                    tilePos = New Point(Int((Point.X - tileOffset.X) / tileSize.Width), Int((Point.Y - tileOffset.Y) / tileSize.Height))
+                    tilePos = New Point(
+                        CInt(Int((Point.X - tileOffset.X) / tileSize.Width)),
+                        CInt(Int((Point.Y - tileOffset.Y) / tileSize.Height))
+                    )
 
                     For yy = tilePos.Y To tilePos.Y + (_size.Height / tileSize.Height) + 1
                         For xx = tilePos.X To tilePos.X + (_size.Width / tileSize.Width) + 1
-                            _parent._geMap(n).Invalidated(New Point(xx, yy)) = True
+                            _parent._geMap(n).Invalidated(New Point(CInt(xx), CInt(yy))) = True
                         Next
                     Next
                 Next
@@ -1119,8 +1125,8 @@
 
             ' Get number of tiles in X and Y direction
 
-            numberTilesX = pbTileSet.Image.Width / tileSize.Width
-            numberTilesY = pbTileSet.Image.Height / tileSize.Height
+            numberTilesX = CInt(pbTileSet.Image.Width / tileSize.Width)
+            numberTilesY = CInt(pbTileSet.Image.Height / tileSize.Height)
 
             ' Loop through each row and column per individual tile
 
@@ -1151,7 +1157,7 @@
 
                     End Using
 
-                    _geTileset.Add(bm.Clone)
+                    _geTileset.Add(CType(bm.Clone, Image))
                     _count += 1
 
                 Next

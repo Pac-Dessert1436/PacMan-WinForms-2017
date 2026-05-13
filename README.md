@@ -3,6 +3,8 @@
 ## Description
 This project is a fully functional, modernized Pac-Man game built with VB.NET WinForms, originally based on [Matt Jones' 2017 project](https://github.com/matthewjones089/Pac-Man). This modified version features updated visuals and improved framework compatibility while preserving the classic gameplay experience.
 
+> **Latest Update on May 13th 2026**: Added the project-level `Option Strict On` compiler option with every implicit conversion resolved for type safety, preventing common type-related errors and improves code quality. This does not affect the game's functionality.
+
 ## Key Enhancements
 - Modernized visual style with updated game font (inspired by Namco's _Pac-Man Arrangement 1996_) and refreshed sprites
 - Upgraded from **.NET Framework 4.5** to **.NET 9.0** for improved performance and compatibility
@@ -11,6 +13,7 @@ This project is a fully functional, modernized Pac-Man game built with VB.NET Wi
     - **Background music**: "P.A.R.T.Y. - Universe Festival" from anime _Kamen Rider Zi-O Over Quartzer_
 - Resolved all compiler warnings and naming convention issues, including enum members
 - Full compatibility with Visual Studio 2022/2026
+- **Added project-level `Option Strict On` and resolved all implicit conversions**
 
 ### Features
 - Authentic arcade-style ghost AI

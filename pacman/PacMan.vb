@@ -31,7 +31,7 @@ Public Class PacMan
     End Structure
 
     Structure PacManData
-        Public name
+        Public name As String
         Public startPixel As Point
         Public startDirection As Actor.ActorDirection
     End Structure
@@ -221,7 +221,7 @@ Public Class PacMan
                     maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.blank
 
                     ' Update the gameEngine map, replacing the dot with a blank tile
-                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Point(0, 3))) = Maze.MazeObjects.blank
+                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Size(0, 3))) = Maze.MazeObjects.blank
 
                     ' Inform the ghost releaser that a dot has been eaten
                     Actor.ghostReleaser.DotEat()
@@ -269,7 +269,7 @@ Public Class PacMan
                     maze.Data(Actor.PacmanByName("pacman").Tile) = Maze.MazeObjects.blank
 
                     ' Update the gameEngine map, replacing the energizer with a blank tile
-                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Point(0, 3))) = Maze.MazeObjects.blank
+                    GameEngine.MapByName("main").Value(Point.Add(Actor.PacmanByName("pacman").Tile, New Size(0, 3))) = Maze.MazeObjects.blank
 
                     ' If the number of dots eaten equal the total maze dot count then
                     ' the maze is complete and we need to start the next level
@@ -448,12 +448,12 @@ Public Class PacMan
 
                         If .EatenTimer = (60 * 3) Then
                             sndGhostEaten.PlayOnce()
-                            score += (2 ^ (.EatenScore + 1)) * 100
+                            score += CInt(2 ^ (.EatenScore + 1)) * 100
                         End If
 
                         ' Display the eaten score in the appropriate location
                         GameEngine.SpriteByName(.Name & "score").AnimationRange = New GameEngine.Sprite.GE_AnimationRange(.EatenScore, .EatenScore)
-                        GameEngine.SpriteByName(.Name & "score").Point = Point.Add(.EatenPixel, New Point(-7, 16))
+                        GameEngine.SpriteByName(.Name & "score").Point = Point.Add(.EatenPixel, New Size(-7, 16))
                         GameEngine.SpriteByName(.Name & "score").Enabled = True
                     Else
 
@@ -643,7 +643,7 @@ Public Class PacMan
 
     End Sub
 
-    Function InitializeGame()
+    Sub InitializeGame()
 
         ' Set Form to use double buffering
         ' This prevents flickering as it uses two surfaces and flicks between each
@@ -838,7 +838,7 @@ Public Class PacMan
         ' Load the highscore
         Try
             Dim stream As New StreamReader("HighScore.txt")
-            highScore = stream.ReadLine()
+            highScore = CInt(stream.ReadLine())
             stream.Close()
         Catch
             highScore = 0
@@ -850,9 +850,7 @@ Public Class PacMan
 
         GameEngine.StartEngine()
 
-        Return True
-
-    End Function
+    End Sub
 
     Public Sub ResetGame()
 
@@ -953,7 +951,7 @@ Public Class PacMan
         ' This displays the number of lives (represented by pacman sprites), and the current
         ' level (represented by the last 7 fruit bonuses)
 
-        Dim FruitChar
+        Dim FruitChar As String
 
         ' Process the list of last fruit bonuses. The list is passed as a string of numbers, where
         ' each number represents the fruit that needs rendering. A blank space indicates a blank tile.
@@ -964,7 +962,7 @@ Public Class PacMan
 
             ' If the fruit character is not blank then render the fruit
             If FruitChar <> " " Then
-                GameEngine.MapByName("status").Value(New Point(l + 6, 0)) = Int(FruitChar + 1)
+                GameEngine.MapByName("status").Value(New Point(l + 6, 0)) = CInt(FruitChar) + 1
             Else
                 GameEngine.MapByName("status").Value(New Point(l + 6, 0)) = 0
             End If
